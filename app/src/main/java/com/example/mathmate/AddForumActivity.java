@@ -2,6 +2,7 @@ package com.example.mathmate;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,7 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class AddForumActivity extends AppCompatActivity {
 
-    Button backBTN;
+    ImageButton backBTN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
