@@ -1,6 +1,7 @@
 package com.example.mathmate;
 
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class AddForumActivity extends AppCompatActivity {
+
+    Button backBTN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,5 +23,10 @@ public class AddForumActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+        backBTN = findViewById(R.id.go_back_btn);
+        backBTN.setOnClickListener(v -> finish());
+
     }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/profile"
+        android:icon="@drawable/profile"
+
+        android:title="Profile" />
+    <item
+        android:id="@+id/add_forum"
+        android:title="Add Forum"
+        android:icon="@drawable/add"
+        />
+    <item
+        android:id="@+id/forums"
+        android:icon="@drawable/forum"
+        android:title="Forums" />
+</menu>
