@@ -11,4 +11,9 @@
     <string name="take_photo">Take photo</string>
     <string name="submit">Submit</string>
     <string name="add_title">Add title</string>
+    <string name="loading">Loading</string>
+    <string name="statistics">Statistics</string>
+    <string name="points_earned">Points earned</string>
+    <string name="questions_answered">Questions answered</string>
+    <string name="todo">TODO</string>
 </resources>

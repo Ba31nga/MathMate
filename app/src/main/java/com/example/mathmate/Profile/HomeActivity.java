@@ -34,7 +34,7 @@ public class HomeActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        replaceFragment(new ForumsFragment());
+        replaceFragment(new ProfileFragment());
 
         bottom_nav_bar = findViewById(R.id.bottomNavigationView);
         bottom_nav_bar.setOnItemSelectedListener(menuItem -> {
