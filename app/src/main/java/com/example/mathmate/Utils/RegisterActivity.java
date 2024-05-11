@@ -141,10 +141,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             } else {
                                 Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
-
                             }
-
-
                         });
 
                     } else {
@@ -165,7 +162,6 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     }
                 });
-
             }
 
             @Override

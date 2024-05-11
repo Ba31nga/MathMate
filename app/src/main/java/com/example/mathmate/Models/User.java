@@ -7,6 +7,14 @@ public class User {
     private int questionAnswered;
     private int userPoints;
 
+    public User() {
+        username = "";
+        bio = "no bio";
+        profileImage = "";
+        questionAnswered = 0;
+        userPoints = 0;
+    }
+
     public User(String username) {
         this.username = username;
         bio = "no bio";
