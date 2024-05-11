@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "956362437095",
+    "firebase_url": "https://mathmate-16c39-default-rtdb.firebaseio.com",
+    "project_id": "mathmate-16c39",
+    "storage_bucket": "mathmate-16c39.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956362437095:android:07f00b11aa934a9b93cd42",
+        "android_client_info": {
+          "package_name": "com.example.mathmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "956362437095-t9jgo81rssq0g6pbak4ivdccaal43tn8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAt2-xbg2_wu4e33unwFe6jRD7QQOAVT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "956362437095-t9jgo81rssq0g6pbak4ivdccaal43tn8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

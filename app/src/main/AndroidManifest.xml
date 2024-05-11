@@ -13,7 +13,19 @@
         android:theme="@style/Theme.MathMate"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".AddForumActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Profile.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Utils.RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Utils.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

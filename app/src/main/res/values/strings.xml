@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">MathMate</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_description">Add description</string>
+    <string name="add_subtitle">Add subtitle</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="upload">upload</string>
+    <string name="back">back</string>
+    <string name="browse_gallery">Browse gallery</string>
+    <string name="take_photo">Take photo</string>
+    <string name="submit">Submit</string>
+    <string name="add_title">Add title</string>
 </resources>
