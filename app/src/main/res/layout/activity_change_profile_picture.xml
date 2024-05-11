@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:backgroundTint="@color/purple"
-        android:text="Choose picture"
+        android:text="@string/choose_picture"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
@@ -24,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@color/dark_grey"
+        android:contentDescription="@string/todo"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,8 +35,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:background="@color/dark_grey"
+            android:contentDescription="@string/todo"
             app:srcCompat="@drawable/go_back"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
@@ -44,8 +46,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:contentDescription="@string/todo"
             android:gravity="center"
-            android:text="Change profile picture"
+            android:text="@string/change_profile_picture"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -53,6 +56,8 @@
     <ImageView
         android:id="@+id/new_pfp"
         android:layout_width="120dp"
+        android:contentDescription="@string/todo"
+        android:scaleType="fitXY"
         android:layout_marginTop="50dp"
         android:layout_height="120dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +69,7 @@
         android:id="@+id/save_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="@string/save"
         android:backgroundTint="@color/purple"
         android:layout_marginBottom="50dp"
         android:width="270dp"

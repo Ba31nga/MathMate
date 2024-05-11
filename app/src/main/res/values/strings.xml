@@ -16,4 +16,7 @@
     <string name="points_earned">Points earned</string>
     <string name="questions_answered">Questions answered</string>
     <string name="todo">TODO</string>
+    <string name="choose_picture">Choose picture</string>
+    <string name="change_profile_picture">Change profile picture</string>
+    <string name="save">Save</string>
 </resources>
