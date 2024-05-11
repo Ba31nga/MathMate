@@ -166,7 +166,7 @@
             android:id="@+id/description_et"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_gravity="top"
+            android:gravity="top|left"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
             android:ems="10"
