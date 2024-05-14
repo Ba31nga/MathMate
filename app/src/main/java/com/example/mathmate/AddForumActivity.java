@@ -25,7 +25,6 @@ public class AddForumActivity extends AppCompatActivity {
             return insets;
         });
 
-
         backBTN = findViewById(R.id.go_back_btn);
         backBTN.setOnClickListener(v -> finish());
 

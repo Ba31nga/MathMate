@@ -33,6 +33,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.core)
+    implementation(libs.firebase.ui.auth)
+    implementation(libs.firebase.ui.database)
+    implementation(libs.firebase.ui.firestore.v802)
+
     implementation(libs.circleimageview)
     implementation(libs.github.glide)
     implementation(libs.appcompat)
