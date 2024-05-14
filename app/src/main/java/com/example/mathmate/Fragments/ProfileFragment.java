@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +36,7 @@ public class ProfileFragment extends Fragment {
     private String username, bio, QA, points;
     private FirebaseAuth authProfile;
     private ImageView pfp;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,6 +47,9 @@ public class ProfileFragment extends Fragment {
         bio_tv = v.findViewById(R.id.bio_tv);
         QA_tv = v.findViewById(R.id.QA_tv);
         points_tv = v.findViewById(R.id.points_tv);
+        progressBar = v.findViewById(R.id.progressBar);
+
+        progressBar.setVisibility(View.VISIBLE);
 
         ImageButton logout_btn = v.findViewById(R.id.logout_btn);
         ImageButton settings_btn = v.findViewById(R.id.settings_btn);
@@ -59,6 +64,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
                 startActivity(intent);
+
             }
         });
 
@@ -105,6 +111,7 @@ public class ProfileFragment extends Fragment {
 
                     // Imageview setImageURI() should not be used with regular URIs - so we are using Picasso
                     Glide.with(getContext()).load(uri).placeholder(R.drawable.default_pfp).into(pfp);
+                    progressBar.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                 }

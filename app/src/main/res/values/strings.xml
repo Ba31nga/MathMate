@@ -19,4 +19,5 @@
     <string name="choose_picture">Choose picture</string>
     <string name="change_profile_picture">Change profile picture</string>
     <string name="save">Save</string>
+    <string name="search">Search</string>
 </resources>

@@ -1,7 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/darkBG"
-    tools:context=".Fragments.ForumsFragment"/>
+    tools:context=".Fragments.ForumsFragment">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout7" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UselessParent">
+
+        <EditText
+            android:id="@+id/search_bar"
+            android:layout_width="325dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:autofillHints=""
+            android:background="@drawable/corner_radius"
+            android:ems="10"
+            android:hint="@string/search"
+            android:inputType="text"
+            android:paddingStart="5dp"
+            android:text=""
+            android:textColor="@color/white"
+            android:textColorHint="#9C9C9C"
+            android:textSize="13sp"
+            tools:ignore="RtlSymmetry" />
+
+        <ImageButton
+            android:id="@+id/search_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/corner_radius"
+            android:backgroundTint="@color/darkBG"
+            android:contentDescription="@string/todo"
+            android:src="@drawable/search" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -60,8 +60,5 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
+
 }
