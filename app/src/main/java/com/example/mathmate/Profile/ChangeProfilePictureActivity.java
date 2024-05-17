@@ -20,11 +20,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -93,12 +96,16 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
                     fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Uri downloadUri = uri;
                             firebaseUser = authProfile.getCurrentUser();
 
                             // Finally set the display image of the user after upload
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setPhotoUri(downloadUri).build();
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setPhotoUri(uri).build();
                             firebaseUser.updateProfile(profileUpdates);
+
+                            // add it to the realtime database
+                            User update = new User(firebaseUser.getDisplayName(), uri.toString());
+                            DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
+                            referenceProfile.child(firebaseUser.getUid()).setValue(update);
 
                             // Return to user profile
                             Toast.makeText(ChangeProfilePictureActivity.this, "New profile picture added successfully", Toast.LENGTH_SHORT).show();

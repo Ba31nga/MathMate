@@ -1,16 +1,18 @@
 package com.example.mathmate.Models;
 
+import android.net.Uri;
+
 public class User {
     private String username;
     private String bio;
-    private String profileImage;
     private int questionAnswered;
     private int userPoints;
+    private String uri;
 
     public User() {
         username = "";
         bio = "no bio";
-        profileImage = "";
+        uri = "";
         questionAnswered = 0;
         userPoints = 0;
     }
@@ -18,13 +20,24 @@ public class User {
     public User(String username) {
         this.username = username;
         bio = "no bio";
-        profileImage = "";
+        uri = "";
+        questionAnswered = 0;
+        userPoints = 0;
+    }
+    public User(String username, String uri) {
+        this.username = username;
+        bio = "no bio";
+        this.uri = uri;
         questionAnswered = 0;
         userPoints = 0;
     }
 
     public String getUsername() {
         return username;
+    }
+
+    public String getUri() {
+        return uri;
     }
 
     public String getBio() {
@@ -37,6 +50,10 @@ public class User {
 
     public int getUserPoints() {
         return userPoints;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public void setUsername(String username) {

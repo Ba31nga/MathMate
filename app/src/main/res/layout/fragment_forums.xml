@@ -56,5 +56,7 @@
             android:backgroundTint="@color/darkBG"
             android:contentDescription="@string/todo"
             android:src="@drawable/search" />
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

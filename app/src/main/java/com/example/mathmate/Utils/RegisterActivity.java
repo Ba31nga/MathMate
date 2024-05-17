@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,7 @@ import java.util.Objects;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText email_input, username_input, password_input, confirm_input;
+    private ProgressBar progressBar;
     private static final String TAG = "RegisterActivity";
 
     @Override
@@ -41,6 +44,9 @@ public class RegisterActivity extends AppCompatActivity {
         username_input = findViewById(R.id.username_input);
         password_input = findViewById(R.id.password_input);
         confirm_input = findViewById(R.id.confirm_input);
+        progressBar = findViewById(R.id.progressBar2);
+
+        progressBar.setVisibility(View.GONE);
 
         Button create_an_account_btn = findViewById(R.id.create_an_account_button);
         Button back_to_login_btn = findViewById(R.id.back_to_login_button);
@@ -93,6 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     // a function that registers the user by the information given by him
     private void registerUser(String email, String username, String password) {
+        progressBar.setVisibility(View.VISIBLE);
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
 
@@ -130,6 +137,8 @@ public class RegisterActivity extends AppCompatActivity {
                         DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
                         referenceProfile.child(firebaseUser.getUid()).setValue(userDetails).addOnCompleteListener(task1 -> {
                             if (task1.isSuccessful()) {
+                                progressBar.setVisibility(View.GONE);
+
                                 // user details was added to the realtime database
                                 Toast.makeText(RegisterActivity.this, "User registered successfully, please VERIFY your email", Toast.LENGTH_SHORT).show();
 
@@ -140,6 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 finish();
 
                             } else {
+                                progressBar.setVisibility(View.GONE);
                                 Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
                             }
                         });

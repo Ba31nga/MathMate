@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.mathmate.Models.User;
 import com.example.mathmate.Profile.HomeActivity;
 import com.example.mathmate.R;
 import com.google.firebase.auth.FirebaseAuth;
