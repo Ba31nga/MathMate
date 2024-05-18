@@ -58,7 +58,7 @@
         <EditText
             android:id="@+id/description_et"
             android:layout_width="wrap_content"
-            android:layout_height="600dp"
+            android:layout_height="500dp"
             android:layout_gravity="center"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
@@ -71,7 +71,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/continue_btn"
+        android:id="@+id/submit_btn"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dp"

@@ -1,14 +1,23 @@
 package com.example.mathmate.Models;
 
+import java.util.UUID;
+
 public class Comment {
+    public String id;
     public String forumId;
     public String authorId;
     public String message;
 
     public Comment(String forumId, String authorId, String message) {
+        UUID uuid = UUID.randomUUID();
+        id = uuid.toString();
         this.forumId = forumId;
         this.authorId = authorId;
         this.message = message;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getForumId() {

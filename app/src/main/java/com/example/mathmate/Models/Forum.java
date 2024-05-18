@@ -1,16 +1,30 @@
 package com.example.mathmate.Models;
 
+import java.util.UUID;
+
 public class Forum {
+    public String id;
+    public String authorUid;
     public String title;
-    public String subTitle;
+    public String subject;
     public String description;
     public String imageUri;
 
-    public Forum(String title, String subTitle, String description, String imageUri) {
+
+    public Forum(String title, String subject, String description, String imageUri, String authorUid) {
+        UUID uuid = UUID.randomUUID();
+        id = uuid.toString();
         this.title = title;
-        this.subTitle = subTitle;
+        this.subject = subject;
         this.description = description;
         this.imageUri = imageUri;
+        this.authorUid = authorUid;
+    }
+
+    public String getAuthorUid() { return  authorUid; }
+
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -18,7 +32,7 @@ public class Forum {
     }
 
     public String getSubTitle() {
-        return subTitle;
+        return subject;
     }
 
     public String getDescription() {
@@ -34,7 +48,7 @@ public class Forum {
     }
 
     public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
+        this.subject = subTitle;
     }
 
     public void setDescription(String description) {
