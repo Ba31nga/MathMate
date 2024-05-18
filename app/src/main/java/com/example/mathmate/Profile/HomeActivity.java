@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.mathmate.AddForumActivity;
 import com.example.mathmate.Fragments.ForumsFragment;
+import com.example.mathmate.Fragments.NotificationsFragment;
 import com.example.mathmate.Fragments.ProfileFragment;
 import com.example.mathmate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -47,6 +48,9 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
             } else if (menuItem.getItemId() == R.id.forums) {
                 replaceFragment(new ForumsFragment());
+            }
+            else if (menuItem.getItemId() == R.id.notifications) {
+                replaceFragment(new NotificationsFragment());
             }
             return true;
         });

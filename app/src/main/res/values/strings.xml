@@ -22,4 +22,8 @@
     <string name="search">Search</string>
     <string name="username">Username</string>
     <string name="bio">bio</string>
+    <string name="forums">Forums</string>
+    <string name="profile">Profile</string>
+    <string name="add_forum">Add Forum</string>
+    <string name="notifications">Notifications</string>
 </resources>
