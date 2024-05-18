@@ -26,8 +26,8 @@
 
         <ImageButton
             android:id="@+id/go_back_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:backgroundTint="@color/darkBG"
             android:contentDescription="@string/back"
             app:srcCompat="@drawable/go_back" />
@@ -123,14 +123,14 @@
         <EditText
             android:id="@+id/title_et"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="15dp"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
             android:ems="10"
-            android:layout_marginBottom="15dp"
             android:inputType="text"
             android:textColor="@color/white"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/textView7"
@@ -144,14 +144,14 @@
         <EditText
             android:id="@+id/subtitle_et"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="15dp"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
             android:ems="10"
-            android:layout_marginBottom="15dp"
             android:inputType="text"
             android:textColor="@color/white"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/textView8"
@@ -166,13 +166,13 @@
             android:id="@+id/description_et"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:gravity="top|left"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
             android:ems="10"
+            android:gravity="top|start"
             android:inputType="text"
             android:textColor="@color/white"
-            tools:ignore="LabelFor" />
+            tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
     </LinearLayout>
 
