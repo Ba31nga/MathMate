@@ -46,9 +46,10 @@
 
 
     <LinearLayout
-        android:layout_marginTop="20dp"
+        android:id="@+id/linearLayout9"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,7 +58,7 @@
         <EditText
             android:id="@+id/description_et"
             android:layout_width="wrap_content"
-            android:layout_height="500dp"
+            android:layout_height="600dp"
             android:layout_gravity="center"
             android:autofillHints=""
             android:background="@drawable/corner_radius"
@@ -68,4 +69,15 @@
             tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/continue_btn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:backgroundTint="@color/purple"
+        android:text="@string/submit"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
