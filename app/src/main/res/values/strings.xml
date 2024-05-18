@@ -26,4 +26,7 @@
     <string name="profile">Profile</string>
     <string name="add_forum">Add Forum</string>
     <string name="notifications">Notifications</string>
+    <string name="CON">Continue</string>
+    <string name="subject">Subject</string>
+    <string name="what_is_your_question">What is your question?</string>
 </resources>

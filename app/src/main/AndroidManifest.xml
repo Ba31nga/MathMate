@@ -13,6 +13,9 @@
         android:theme="@style/Theme.MathMate"
         tools:targetApi="31">
         <activity
+            android:name=".ContinueAddForumActivity"
+            android:exported="false" />
+        <activity
             android:name=".Profile.ChangeProfilePictureActivity"
             android:exported="false" />
         <activity
