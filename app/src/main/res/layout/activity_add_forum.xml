@@ -58,6 +58,12 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
         <ImageView
+            android:id="@+id/forum_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@android:drawable/editbox_dropdown_dark_frame" />
+
+        <ImageView
             android:id="@+id/upload_img"
             android:layout_width="50dp"
             android:layout_height="50dp"

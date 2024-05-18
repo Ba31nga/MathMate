@@ -1,7 +1,5 @@
 package com.example.mathmate.Models;
 
-import android.net.Uri;
-
 public class User {
     private String username;
     private String bio;
