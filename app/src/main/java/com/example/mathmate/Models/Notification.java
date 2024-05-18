@@ -1,9 +1,9 @@
 package com.example.mathmate.Models;
 
 public class Notification {
-    private String userId;
-    private String text;
-    private String forumId;
+    private final String userId;
+    private final String text;
+    private final String forumId;
 
     public Notification(String userId, String text, String forumId) {
         this.userId = userId;
@@ -11,5 +11,15 @@ public class Notification {
         this.forumId = forumId;
     }
 
+    public String getUserId() {
+        return userId;
+    }
 
+    public String getText() {
+        return text;
+    }
+
+    public String getForumId() {
+        return forumId;
+    }
 }
