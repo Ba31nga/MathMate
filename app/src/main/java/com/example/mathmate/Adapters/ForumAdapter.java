@@ -5,12 +5,11 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Models.Forum;
@@ -25,56 +24,41 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class ForumAdapter extends ArrayAdapter<Forum> {
+public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> {
 
-    private LayoutInflater mInflater;
-    private List<Forum> mForums;
-    private int layoutResource;
-    private Context mContext;
+    private Context context;
+    private List<Forum> forums;
 
-
-    public ForumAdapter(@NonNull Context context, int resource, @NonNull List<Forum> objects) {
-        super(context, resource, objects);
-        mContext = context;
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layoutResource = resource;
-        this.mForums = objects;
+    public ForumAdapter(Context context, List<Forum> forums) {
+        this.context = context;
+        this.forums = forums;
     }
 
-    private static class ViewHolder {
-        TextView title, subject;
-        ImageView profilePicture;
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(context).inflate(R.layout.search_forum_row, parent, false);
+        return new ForumAdapter.ViewHolder(v);
     }
 
     @Override
-    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        ViewHolder holder;
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-        if (convertView == null){
-            convertView = mInflater.inflate(layoutResource, parent, false);
-            holder = new ViewHolder();
+        final Forum forum = forums.get(position);
 
-            holder.title = convertView.findViewById(R.id.title_et);
-            holder.subject = convertView.findViewById(R.id.subject_et);
-            holder.profilePicture = convertView.findViewById(R.id.profile_picture);
-
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        holder.title.setText(mForums.get(position).getTitle());
-        holder.subject.setText(mForums.get(position).getSubject());
+        holder.title.setText(forum.getTitle());
+        holder.subject.setText(forum.getSubject());
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
-        Query query = reference.orderByValue().equalTo(mForums.get(position).getAuthorUid());
+        Query query = reference.orderByValue().equalTo(forum.getAuthorUid());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    // putting the profile picture of the author
                     User user = dataSnapshot.getValue(User.class);
-                    Glide.with(mContext).load(Uri.parse(user.getUri())).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
+                    assert user != null;
+                    Uri uriImage = Uri.parse(user.getUri());
+                    Glide.with(context).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
                 }
             }
 
@@ -83,6 +67,28 @@ public class ForumAdapter extends ArrayAdapter<Forum> {
             }
         });
 
-        return convertView;
+        holder.itemView.setOnClickListener(v -> {
+            // TODO : move the user to the forum activity
+        });
     }
+
+    @Override
+    public int getItemCount() {
+        return 0;
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public TextView title, subject;
+        public ImageView profilePicture;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            title = itemView.findViewById(R.id.title_et);
+            subject = itemView.findViewById(R.id.subject_et);
+            profilePicture = itemView.findViewById(R.id.profile_picture);
+        }
+    }
+
+
 }

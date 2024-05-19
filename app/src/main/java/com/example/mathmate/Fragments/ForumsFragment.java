@@ -7,13 +7,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Forum;
@@ -34,8 +32,7 @@ public class ForumsFragment extends Fragment {
 
     // widgets
     private EditText search_bar;
-    private ImageButton search_btn;
-    private ListView listView;
+    private RecyclerView recyclerView;
 
     // vars
     private List<Forum> mForumList;
@@ -49,16 +46,12 @@ public class ForumsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_forums, container, false);
 
         search_bar = v.findViewById(R.id.search_bar);
-        search_btn = v.findViewById(R.id.search_btn);
-        listView = v.findViewById(R.id.list_view);
         database = FirebaseDatabase.getInstance().getReference("Forums");
-
-
-        mForumList = new ArrayList<>();
-        adapter = new ForumAdapter(getContext(), R.layout.search_forum_row, mForumList);
-        listView.setAdapter(adapter);
+        recyclerView = v.findViewById(R.id.recyclerView);
 
         initTextListener("title");
+
+
 
 
 
@@ -102,9 +95,10 @@ public class ForumsFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         mForumList.add(dataSnapshot.getValue(Forum.class));
+
                         // update the users list view
+                        updateForumList();
                     }
-                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -115,20 +109,26 @@ public class ForumsFragment extends Fragment {
         }
     }
 
-    private void updateForumList() {
-        adapter = new ForumAdapter(getContext(), R.layout.search_forum_row, mForumList);
-        listView.setAdapter(adapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    private void ReadAllUsers() {
+        database.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // navigate to forum activity
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Forum forum = dataSnapshot.getValue(Forum.class);
+                    mForumList.add(forum);
+                }
+                updateForumList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
     }
 
-    private void ReadAllUsers() {
+    private void updateForumList() {
+        adapter = new ForumAdapter(getContext(), mForumList);
+        recyclerView.setAdapter(adapter);
     }
 
 
