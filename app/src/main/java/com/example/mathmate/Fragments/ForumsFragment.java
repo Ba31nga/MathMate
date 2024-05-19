@@ -7,13 +7,17 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
@@ -34,13 +38,12 @@ public class ForumsFragment extends Fragment {
     // widgets
     private EditText search_bar;
     private ImageButton search_btn;
-    private RecyclerView recyclerView;
+    private ListView listView;
 
     // vars
-    List<Forum> mForumList;
-
-    // vars
-    DatabaseReference database;
+    private List<Forum> mForumList;
+    private DatabaseReference database;
+    private ForumAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,8 +53,15 @@ public class ForumsFragment extends Fragment {
 
         search_bar = v.findViewById(R.id.search_bar);
         search_btn = v.findViewById(R.id.search_btn);
-        recyclerView = v.findViewById(R.id.recycler_view);
+        listView = v.findViewById(R.id.list_view);
         database = FirebaseDatabase.getInstance().getReference("Forums");
+
+
+        mForumList = new ArrayList<>();
+        adapter = new ForumAdapter(getContext(), R.layout.search_forum_recycler_row, mForumList);
+        listView.setAdapter(adapter);
+
+        initTextListener("title");
 
 
 
@@ -97,6 +107,7 @@ public class ForumsFragment extends Fragment {
                         mForumList.add(dataSnapshot.getValue(Forum.class));
                         // update the users list view
                     }
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -108,7 +119,15 @@ public class ForumsFragment extends Fragment {
     }
 
     private void updateForumList() {
+        adapter = new ForumAdapter(getContext(), R.layout.search_forum_recycler_row, mForumList);
+        listView.setAdapter(adapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // navigate to forum activity
+            }
+        });
 
     }
 
