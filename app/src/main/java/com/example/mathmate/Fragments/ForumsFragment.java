@@ -49,11 +49,14 @@ public class ForumsFragment extends Fragment {
         database = FirebaseDatabase.getInstance().getReference("Forums");
         recyclerView = v.findViewById(R.id.recyclerView);
 
-        initTextListener("title");
 
-
-
-
+        if (TextUtils.isEmpty(search_bar.getText().toString())) {
+            mForumList = new ArrayList<>();
+            ReadAllUsers();
+        }
+        else {
+            initTextListener("title");
+        }
 
 
 
@@ -66,7 +69,6 @@ public class ForumsFragment extends Fragment {
         search_bar.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -90,7 +92,7 @@ public class ForumsFragment extends Fragment {
         } else {
             Query query = database.orderByChild(parameter).startAt(keyword);
 
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
+            query.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -127,7 +129,7 @@ public class ForumsFragment extends Fragment {
     }
 
     private void updateForumList() {
-        adapter = new ForumAdapter(getContext(), mForumList);
+        adapter = new ForumAdapter(mForumList);
         recyclerView.setAdapter(adapter);
     }
 

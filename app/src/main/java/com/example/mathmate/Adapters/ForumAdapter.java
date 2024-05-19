@@ -26,18 +26,16 @@ import java.util.List;
 
 public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> {
 
-    private Context context;
-    private List<Forum> forums;
+    private final List<Forum> forums;
 
-    public ForumAdapter(Context context, List<Forum> forums) {
-        this.context = context;
+    public ForumAdapter(List<Forum> forums) {
         this.forums = forums;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.search_forum_row, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_forum_row, parent, false);
         return new ForumAdapter.ViewHolder(v);
     }
 
@@ -58,7 +56,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
                     User user = dataSnapshot.getValue(User.class);
                     assert user != null;
                     Uri uriImage = Uri.parse(user.getUri());
-                    Glide.with(context).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
+                    Glide.with(holder.itemView.getContext()).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
                 }
             }
 
@@ -74,7 +72,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return 0;
+        return forums.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
