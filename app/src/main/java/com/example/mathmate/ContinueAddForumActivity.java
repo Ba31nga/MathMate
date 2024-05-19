@@ -1,7 +1,6 @@
 package com.example.mathmate;
 
 import android.content.ContentResolver;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,18 +19,12 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mathmate.Models.Forum;
-import com.example.mathmate.Models.User;
-import com.example.mathmate.Profile.ChangeProfilePictureActivity;
-import com.example.mathmate.Profile.HomeActivity;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 public class ContinueAddForumActivity extends AppCompatActivity {
 
@@ -97,26 +90,18 @@ public class ContinueAddForumActivity extends AppCompatActivity {
         StorageReference fileReference = storageReference.child(forum.getId() + "." + getFileExtension(uri));
 
         // Upload image to storage
-        fileReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
+        fileReference.putFile(uri).addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri1 -> {
 
-                        // adds it to the realtime database
-                        forum.setImageUri(uri.toString());
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Forums");
-                        reference.child(forum.getId()).setValue(forum);
+            // adds it to the realtime database
+            forum.setImageUri(uri1.toString());
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Forums");
+            reference.child(forum.getId()).setValue(forum);
 
-                        // Return to user profile
-                        Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-                        finish();
-                    }
-                });
-            }
-        });
+            // Return to user profile
+            Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();
+            progressBar.setVisibility(View.GONE);
+            finish();
+        }));
 
     }
 
