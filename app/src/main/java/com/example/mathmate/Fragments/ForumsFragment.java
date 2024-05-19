@@ -11,15 +11,12 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Forum;
-import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,7 +55,7 @@ public class ForumsFragment extends Fragment {
 
 
         mForumList = new ArrayList<>();
-        adapter = new ForumAdapter(getContext(), R.layout.search_forum_recycler_row, mForumList);
+        adapter = new ForumAdapter(getContext(), R.layout.search_forum_row, mForumList);
         listView.setAdapter(adapter);
 
         initTextListener("title");
@@ -119,7 +116,7 @@ public class ForumsFragment extends Fragment {
     }
 
     private void updateForumList() {
-        adapter = new ForumAdapter(getContext(), R.layout.search_forum_recycler_row, mForumList);
+        adapter = new ForumAdapter(getContext(), R.layout.search_forum_row, mForumList);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
