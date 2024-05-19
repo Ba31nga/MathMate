@@ -22,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -30,7 +29,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 public class ChangeProfilePictureActivity extends AppCompatActivity {
 
@@ -90,31 +88,23 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
 
             // Upload image to storage
-            fileReference.putFile(uriImage).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    fileReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            firebaseUser = authProfile.getCurrentUser();
+            fileReference.putFile(uriImage).addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                firebaseUser = authProfile.getCurrentUser();
 
-                            // Finally set the display image of the user after upload
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setPhotoUri(uri).build();
-                            firebaseUser.updateProfile(profileUpdates);
+                // Finally set the display image of the user after upload
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setPhotoUri(uri).build();
+                firebaseUser.updateProfile(profileUpdates);
 
-                            // add it to the realtime database
-                            User update = new User(firebaseUser.getDisplayName(), uri.toString());
-                            DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
-                            referenceProfile.child(firebaseUser.getUid()).setValue(update);
+                // add it to the realtime database
+                User update = new User(firebaseUser.getDisplayName(), uri.toString());
+                DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("Registered Users");
+                referenceProfile.child(firebaseUser.getUid()).setValue(update);
 
-                            // Return to user profile
-                            Toast.makeText(ChangeProfilePictureActivity.this, "New profile picture added successfully", Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
-                            finish();
-                        }
-                    });
-                }
-            });
+                // Return to user profile
+                Toast.makeText(ChangeProfilePictureActivity.this, "New profile picture added successfully", Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                finish();
+            }));
         }
     }
 

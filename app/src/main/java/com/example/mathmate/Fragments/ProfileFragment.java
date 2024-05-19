@@ -32,11 +32,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ProfileFragment extends Fragment {
 
+    // widgets
+
     private TextView username_tv, bio_tv, QA_tv, points_tv;
-    private String username, bio, QA, points;
-    private FirebaseAuth authProfile;
     private ImageView pfp;
     private ProgressBar progressBar;
+
+    // vars
+
+    private String username, bio, QA, points;
+    private FirebaseAuth authProfile;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

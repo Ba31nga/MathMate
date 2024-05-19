@@ -29,4 +29,5 @@
     <string name="CON">Continue</string>
     <string name="subject">Subject</string>
     <string name="what_is_your_question">What is your question?</string>
+    <string name="title">Title</string>
 </resources>

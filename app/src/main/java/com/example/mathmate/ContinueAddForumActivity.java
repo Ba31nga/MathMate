@@ -1,6 +1,7 @@
 package com.example.mathmate;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -19,6 +20,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mathmate.Models.Forum;
+import com.example.mathmate.Profile.HomeActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -100,7 +102,11 @@ public class ContinueAddForumActivity extends AppCompatActivity {
             // Return to user profile
             Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.GONE);
-            finish();
+
+            // TODO : move the user to forum activity
+            Intent intent = new Intent(ContinueAddForumActivity.this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }));
 
     }

@@ -11,6 +11,15 @@ public class Forum {
     public String imageUri;
 
 
+    public Forum() {
+        id = "";
+        authorUid = "";
+        title = "";
+        subject = "";
+        description = "";
+        imageUri = "";
+    }
+
     public Forum(String title, String subject, String description, String imageUri, String authorUid) {
         UUID uuid = UUID.randomUUID();
         id = uuid.toString();
@@ -18,6 +27,16 @@ public class Forum {
         this.subject = subject;
         this.description = description;
         this.imageUri = imageUri;
+        this.authorUid = authorUid;
+    }
+
+    public Forum(String title, String subject, String description, String authorUid) {
+        UUID uuid = UUID.randomUUID();
+        id = uuid.toString();
+        this.title = title;
+        this.subject = subject;
+        this.description = description;
+        imageUri = "";
         this.authorUid = authorUid;
     }
 
@@ -31,7 +50,8 @@ public class Forum {
         return title;
     }
 
-    public String getSubTitle() {
+
+    public String getSubject() {
         return subject;
     }
 
@@ -47,8 +67,8 @@ public class Forum {
         this.title = title;
     }
 
-    public void setSubTitle(String subTitle) {
-        this.subject = subTitle;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public void setDescription(String description) {
