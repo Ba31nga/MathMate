@@ -28,8 +28,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.UUID;
-
 public class ContinueAddForumActivity extends AppCompatActivity {
 
 
@@ -88,12 +86,10 @@ public class ContinueAddForumActivity extends AppCompatActivity {
     private void uploadImage() {
         progressBar.setVisibility(View.VISIBLE);
         Uri uri = Uri.parse(uriImage);
-
-        String forumId = UUID.randomUUID().toString();
         Forum forum = new Forum(title, subject, descriptionET.getText().toString(), firebaseUser.getUid());
 
         // Saves the image with id of the forum
-        StorageReference fileReference = storageReference.child(forumId + "." + getFileExtension(uri));
+        StorageReference fileReference = storageReference.child(forum.getId() + "." + getFileExtension(uri));
 
         // Upload image to storage
         fileReference.putFile(uri).addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri1 -> {
@@ -101,7 +97,7 @@ public class ContinueAddForumActivity extends AppCompatActivity {
             // adds it to the realtime database
             forum.setImageUri(uri1.toString());
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Forums");
-            reference.child(forumId).setValue(forum);
+            reference.child(forum.getId()).setValue(forum);
 
             // Return to user profile
             Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();

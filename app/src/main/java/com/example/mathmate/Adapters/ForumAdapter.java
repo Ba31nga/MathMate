@@ -1,6 +1,7 @@
 package com.example.mathmate.Adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,9 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.mathmate.Fragments.DisplayForumFragment;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
@@ -72,7 +75,11 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
 
 
         holder.itemView.setOnClickListener(v -> {
-            // TODO : move the user to the forum activity
+            SharedPreferences.Editor editor = context.getSharedPreferences("PREPS", context.MODE_PRIVATE).edit();
+            editor.putString("forumid", forum.getId());
+            editor.apply();
+
+            ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, new DisplayForumFragment()).commit();
         });
     }
 
