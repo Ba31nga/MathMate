@@ -30,4 +30,7 @@
     <string name="subject">Subject</string>
     <string name="what_is_your_question">What is your question?</string>
     <string name="title">Title</string>
+    <string name="subject_exmp">Subject : geomery</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam posuere libero dui, nec convallis lorem tincidunt id. Nunc aliquet ligula vitae laoreet varius. Sed mattis turpis non nisl accumsan, ut pulvinar arcu mattis. Etiam id massa nec purus congue tincidunt eu sit amet nulla. Sed ultrices ipsum ac est imperdiet imperdiet. Donec cursus nisi et leo luctus, in suscipit ex congue. Etiam sagittis sodales metus. Sed nisl eros, interdum quis posuere nec, efficitur id eros.</string>
+    <string name="questions_asked">Questions asked</string>
 </resources>

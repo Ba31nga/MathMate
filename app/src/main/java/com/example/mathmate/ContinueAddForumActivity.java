@@ -103,7 +103,6 @@ public class ContinueAddForumActivity extends AppCompatActivity {
             Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.GONE);
 
-            // TODO : move the user to forum activity
             Intent intent = new Intent(ContinueAddForumActivity.this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

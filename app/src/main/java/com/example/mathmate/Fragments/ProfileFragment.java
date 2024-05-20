@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.mathmate.Adapters.ForumAdapter;
+import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.Profile.ChangeProfilePictureActivity;
 import com.example.mathmate.R;
@@ -27,7 +31,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ProfileFragment extends Fragment {
@@ -37,11 +45,15 @@ public class ProfileFragment extends Fragment {
     private TextView username_tv, bio_tv, QA_tv, points_tv;
     private ImageView pfp;
     private ProgressBar progressBar;
+    private RecyclerView forumRecycler;
 
     // vars
 
     private String username, bio, QA, points;
     private FirebaseAuth authProfile;
+    FirebaseUser firebaseUser;
+    private ForumAdapter adapter;
+    private List<Forum> forums;
 
 
     @Override
@@ -55,6 +67,10 @@ public class ProfileFragment extends Fragment {
         points_tv = v.findViewById(R.id.points_tv);
         progressBar = v.findViewById(R.id.progressBar);
 
+        forumRecycler = v.findViewById(R.id.forumRecycler);
+        forumRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        forums = new ArrayList<>();
+
         progressBar.setVisibility(View.VISIBLE);
 
         ImageButton logout_btn = v.findViewById(R.id.logout_btn);
@@ -63,15 +79,12 @@ public class ProfileFragment extends Fragment {
         pfp = v.findViewById(R.id.pfp);
 
         authProfile = FirebaseAuth.getInstance();
-        FirebaseUser firebaseUser = authProfile.getCurrentUser();
+        firebaseUser = authProfile.getCurrentUser();
 
-        pfp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
-                startActivity(intent);
+        pfp.setOnClickListener(v12 -> {
+            Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
+            startActivity(intent);
 
-            }
         });
 
         logout_btn.setOnClickListener(v1 -> {
@@ -86,10 +99,29 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         } else {
             showUserProfile(firebaseUser);
+            setUpRecycler();
         }
 
 
         return v;
+    }
+
+    private void setUpRecycler() {
+        Query query = FirebaseDatabase.getInstance().getReference("Forums").orderByChild("authorUid").equalTo(firebaseUser.getUid());
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    forums.add(dataSnapshot.getValue(Forum.class));
+                }
+                adapter = new ForumAdapter(forums, getContext());
+                forumRecycler.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private void showUserProfile(FirebaseUser firebaseUser) {

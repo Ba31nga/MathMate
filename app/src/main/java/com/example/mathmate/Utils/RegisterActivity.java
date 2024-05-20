@@ -25,6 +25,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
@@ -105,16 +106,17 @@ public class RegisterActivity extends AppCompatActivity {
 
         // Checks if username is unique
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+        Query query = dbRef.orderByChild("username").equalTo(username);
 
-        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // loops through the realtime database
                 for (DataSnapshot dsp : snapshot.getChildren()) {
                     User item = dsp.getValue(User.class);
                     if (item != null && item.getUsername().equals(username)) {
                         username_input.requestFocus();
                         username_input.setError("Username is already taken");
+                        progressBar.setVisibility(View.GONE);
                         return;
                     }
                 }
