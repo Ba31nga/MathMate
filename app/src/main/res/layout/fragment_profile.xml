@@ -29,8 +29,10 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/forumRecycler"
             android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_gravity="center" />
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:scrollbars="vertical" />
+
     </LinearLayout>
 
     <LinearLayout
