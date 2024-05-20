@@ -2,11 +2,13 @@ package com.example.mathmate.Adapters;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,15 +29,18 @@ import java.util.List;
 public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> {
 
     private final List<Forum> forums;
+    private final Context context;
 
-    public ForumAdapter(List<Forum> forums) {
+    public ForumAdapter(List<Forum> forums, Context context) {
         this.forums = forums;
+        this.context = context;
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_forum_row, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.search_forum_row, parent, false);
         return new ForumAdapter.ViewHolder(v);
     }
 
@@ -43,12 +48,11 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
         final Forum forum = forums.get(position);
-
         holder.title.setText(forum.getTitle());
         holder.subject.setText(forum.getSubject());
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
-        Query query = reference.orderByValue().equalTo(forum.getAuthorUid());
+
+        Query query = reference.orderByKey().equalTo(forum.getAuthorUid());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -56,7 +60,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
                     User user = dataSnapshot.getValue(User.class);
                     assert user != null;
                     Uri uriImage = Uri.parse(user.getUri());
-                    Glide.with(holder.itemView.getContext()).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
+                    Glide.with(context).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
                 }
             }
 
@@ -64,6 +68,8 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+
+
 
         holder.itemView.setOnClickListener(v -> {
             // TODO : move the user to the forum activity
@@ -82,8 +88,8 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            title = itemView.findViewById(R.id.title_et);
-            subject = itemView.findViewById(R.id.subject_et);
+            title = itemView.findViewById(R.id.forum_title);
+            subject = itemView.findViewById(R.id.forum_subject);
             profilePicture = itemView.findViewById(R.id.profile_picture);
         }
     }

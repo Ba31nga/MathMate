@@ -1,5 +1,7 @@
 package com.example.mathmate.Models;
 
+import androidx.annotation.NonNull;
+
 import java.util.UUID;
 
 public class Forum {
@@ -77,5 +79,11 @@ public class Forum {
 
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return title;
     }
 }

@@ -60,8 +60,7 @@
         android:layout_weight="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout7"
-        tools:listitem="@layout/search_forum_row" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout7" />
 
 
 

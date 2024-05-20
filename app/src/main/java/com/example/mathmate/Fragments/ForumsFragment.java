@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mathmate.Adapters.ForumAdapter;
@@ -48,15 +50,21 @@ public class ForumsFragment extends Fragment {
         search_bar = v.findViewById(R.id.search_bar);
         database = FirebaseDatabase.getInstance().getReference("Forums");
         recyclerView = v.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mForumList = new ArrayList<>();
+        mForumList.add(new Forum("test", "test", "test", "https://firebasestorage.googleapis.com/v0/b/mathmate-16c39.appspot.com/o/Forum%20images%2Fc36bb865-da5c-4fca-9677-fc9536e2a402.jpg?alt=media&token=e7c2f041-0447-4640-ad64-0ed08ed5a63c", "h8WHWCHkYUUAcesJYxnyXzZafup2"));
+        adapter = new ForumAdapter(mForumList, getContext());
+        recyclerView.setAdapter(adapter);
 
 
-        if (TextUtils.isEmpty(search_bar.getText().toString())) {
-            mForumList = new ArrayList<>();
-            ReadAllUsers();
-        }
-        else {
-            initTextListener("title");
-        }
+//        if (TextUtils.isEmpty(search_bar.getText().toString())) {
+//            mForumList = new ArrayList<>();
+//            ReadAllForums();
+//        }
+//        else {
+//            initTextListener("title");
+//        }
 
 
 
@@ -88,7 +96,7 @@ public class ForumsFragment extends Fragment {
         mForumList.clear();
 
         if (TextUtils.isEmpty(keyword)) {
-            ReadAllUsers();
+            ReadAllForums();
         } else {
             Query query = database.orderByChild(parameter).startAt(keyword);
 
@@ -111,7 +119,7 @@ public class ForumsFragment extends Fragment {
         }
     }
 
-    private void ReadAllUsers() {
+    private void ReadAllForums() {
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -119,6 +127,7 @@ public class ForumsFragment extends Fragment {
                     Forum forum = dataSnapshot.getValue(Forum.class);
                     mForumList.add(forum);
                 }
+                Toast.makeText(getContext(), mForumList.toString(), Toast.LENGTH_SHORT).show();
                 updateForumList();
             }
 
@@ -129,7 +138,7 @@ public class ForumsFragment extends Fragment {
     }
 
     private void updateForumList() {
-        adapter = new ForumAdapter(mForumList);
+        adapter = new ForumAdapter(mForumList, getContext());
         recyclerView.setAdapter(adapter);
     }
 
