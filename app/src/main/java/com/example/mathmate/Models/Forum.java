@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import java.util.UUID;
 
 public class Forum {
-    public String id;
     public String authorUid;
     public String title;
     public String subject;
@@ -14,7 +13,6 @@ public class Forum {
 
 
     public Forum() {
-        id = "";
         authorUid = "";
         title = "";
         subject = "";
@@ -23,8 +21,6 @@ public class Forum {
     }
 
     public Forum(String title, String subject, String description, String imageUri, String authorUid) {
-        UUID uuid = UUID.randomUUID();
-        id = uuid.toString();
         this.title = title;
         this.subject = subject;
         this.description = description;
@@ -33,8 +29,6 @@ public class Forum {
     }
 
     public Forum(String title, String subject, String description, String authorUid) {
-        UUID uuid = UUID.randomUUID();
-        id = uuid.toString();
         this.title = title;
         this.subject = subject;
         this.description = description;
@@ -44,9 +38,6 @@ public class Forum {
 
     public String getAuthorUid() { return  authorUid; }
 
-    public String getId() {
-        return id;
-    }
 
     public String getTitle() {
         return title;

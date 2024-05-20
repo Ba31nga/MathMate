@@ -6,6 +6,7 @@
 
     <ImageView
         android:id="@+id/profile_picture"
+        android:scaleType="fitXY"
         android:layout_width="52dp"
         android:layout_height="52dp"
         android:contentDescription="@string/todo"

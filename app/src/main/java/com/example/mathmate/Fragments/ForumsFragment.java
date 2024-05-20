@@ -48,87 +48,71 @@ public class ForumsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_forums, container, false);
 
         search_bar = v.findViewById(R.id.search_bar);
+
         database = FirebaseDatabase.getInstance().getReference("Forums");
+
         recyclerView = v.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mForumList = new ArrayList<>();
-        mForumList.add(new Forum("test", "test", "test", "https://firebasestorage.googleapis.com/v0/b/mathmate-16c39.appspot.com/o/Forum%20images%2Fc36bb865-da5c-4fca-9677-fc9536e2a402.jpg?alt=media&token=e7c2f041-0447-4640-ad64-0ed08ed5a63c", "h8WHWCHkYUUAcesJYxnyXzZafup2"));
-        adapter = new ForumAdapter(mForumList, getContext());
-        recyclerView.setAdapter(adapter);
 
+        readForums();
+        search_bar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-//        if (TextUtils.isEmpty(search_bar.getText().toString())) {
-//            mForumList = new ArrayList<>();
-//            ReadAllForums();
-//        }
-//        else {
-//            initTextListener("title");
-//        }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchForums(s.toString().toLowerCase(), "title");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
 
 
         return v;
     }
 
-    private void initTextListener(String parameter) {
-        mForumList = new ArrayList<>();
+    private void searchForums(String s, String parameter) {
+        Query query = database.orderByChild(parameter).startAt(s).endAt(s + "\uf8ff");
 
-        search_bar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String text = search_bar.getText().toString().toLowerCase(Locale.getDefault());
-                searchForMatch(text, parameter);
-            }
-        });
-    }
-
-    private void searchForMatch(String keyword, String parameter) {
-        mForumList.clear();
-
-        if (TextUtils.isEmpty(keyword)) {
-            ReadAllForums();
-        } else {
-            Query query = database.orderByChild(parameter).startAt(keyword);
-
-            query.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        mForumList.add(dataSnapshot.getValue(Forum.class));
-
-                        // update the users list view
-                        updateForumList();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-    }
-
-    private void ReadAllForums() {
-        database.addValueEventListener(new ValueEventListener() {
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                mForumList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Forum forum = dataSnapshot.getValue(Forum.class);
                     mForumList.add(forum);
                 }
-                Toast.makeText(getContext(), mForumList.toString(), Toast.LENGTH_SHORT).show();
                 updateForumList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readForums() {
+        database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (search_bar.getText().toString().isEmpty()) {
+                    mForumList.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Forum forum = dataSnapshot.getValue(Forum.class);
+                        mForumList.add(forum);
+                    }
+                    updateForumList();
+                }
             }
 
             @Override
@@ -136,6 +120,10 @@ public class ForumsFragment extends Fragment {
             }
         });
     }
+
+
+
+
 
     private void updateForumList() {
         adapter = new ForumAdapter(mForumList, getContext());
