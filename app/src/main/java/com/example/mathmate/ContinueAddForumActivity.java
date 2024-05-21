@@ -72,8 +72,8 @@ public class ContinueAddForumActivity extends AppCompatActivity {
 
         Button submitBTN = findViewById(R.id.submit_btn);
         submitBTN.setOnClickListener(v -> {
-            if (TextUtils.isEmpty(descriptionET.getText().toString())) {
-                descriptionET.setError("Description is required");
+            if (descriptionET.getText().length() < 200) {
+                descriptionET.setError("Your question should have a description of at least 200 words");
                 descriptionET.requestFocus();
             } else {
                 uploadImage();
