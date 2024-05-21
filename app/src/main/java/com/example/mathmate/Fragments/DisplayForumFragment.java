@@ -60,6 +60,7 @@ public class DisplayForumFragment extends Fragment {
         description.setVisibility(View.GONE);
         profile_picture.setVisibility(View.GONE);
         forum_picture.setVisibility(View.GONE);
+        go_to_comments_btn.setVisibility(View.GONE);
 
         SharedPreferences prefs = getContext().getSharedPreferences("PREPS", Context.MODE_PRIVATE);
         forumId = prefs.getString("forumid", "none");
@@ -121,6 +122,7 @@ public class DisplayForumFragment extends Fragment {
                                 description.setVisibility(View.VISIBLE);
                                 profile_picture.setVisibility(View.VISIBLE);
                                 forum_picture.setVisibility(View.VISIBLE);
+                                go_to_comments_btn.setVisibility(View.VISIBLE);
                             }
                         }
 
