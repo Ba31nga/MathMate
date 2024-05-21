@@ -96,5 +96,17 @@
                 android:text="@string/lorem" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/go_to_comments_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:backgroundTint="@color/darkBG"
+            android:text="@string/go_to_comments"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/content" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

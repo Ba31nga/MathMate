@@ -2,6 +2,7 @@ package com.example.mathmate.Fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,11 +13,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.mathmate.CommentsActivity;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
@@ -36,6 +39,7 @@ public class DisplayForumFragment extends Fragment {
 
     TextView username, title, subject, description;
     ImageView profile_picture, forum_picture;
+    Button go_to_comments_btn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +52,7 @@ public class DisplayForumFragment extends Fragment {
         description = v.findViewById(R.id.descrption);
         profile_picture = v.findViewById(R.id.profile_picture);
         forum_picture = v.findViewById(R.id.forum_image);
+        go_to_comments_btn = v.findViewById(R.id.go_to_comments_btn);
 
         username.setVisibility(View.GONE);
         title.setVisibility(View.GONE);
@@ -59,6 +64,11 @@ public class DisplayForumFragment extends Fragment {
         SharedPreferences prefs = getContext().getSharedPreferences("PREPS", Context.MODE_PRIVATE);
         forumId = prefs.getString("forumid", "none");
 
+        go_to_comments_btn.setOnClickListener(v1 -> {
+            Intent intent = new Intent(getContext(), CommentsActivity.class);
+            intent.putExtra("forumid", forumId);
+            startActivity(intent);
+        });
 
 
 
