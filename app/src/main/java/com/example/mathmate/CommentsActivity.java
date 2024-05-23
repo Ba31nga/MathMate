@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Models.Comment;
+import com.example.mathmate.Models.Like;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,8 +33,6 @@ public class CommentsActivity extends AppCompatActivity {
     private ImageView profile_picture;
     FirebaseUser currentUser;
 
-    private ImageButton go_back_btn;
-    private Button post_btn;
     private EditText message;
     private String forumId;
 
@@ -51,10 +50,10 @@ public class CommentsActivity extends AppCompatActivity {
         username = findViewById(R.id.username);
         profile_picture = findViewById(R.id.profile_picture);
         message = findViewById(R.id.comment_input);
-        post_btn = findViewById(R.id.post_btn);
+        Button post_btn = findViewById(R.id.post_btn);
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        go_back_btn = findViewById(R.id.back_btn);
+        ImageButton go_back_btn = findViewById(R.id.back_btn);
         go_back_btn.setOnClickListener(v -> {
             finish();
         });
@@ -77,6 +76,7 @@ public class CommentsActivity extends AppCompatActivity {
     private void addComment() {
         Comment comment = new Comment(forumId, currentUser.getUid(), message.getText().toString());
         DatabaseReference referenceComments = FirebaseDatabase.getInstance().getReference("Comments");
+        // Adding the comment to the realtime database
         referenceComments.child(comment.getId()).setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -88,6 +88,8 @@ public class CommentsActivity extends AppCompatActivity {
                 }
             }
         });
+
+
 
     }
 

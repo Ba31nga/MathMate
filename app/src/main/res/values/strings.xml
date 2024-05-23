@@ -37,4 +37,6 @@
     <string name="write_your_comment">Write your comment</string>
     <string name="post_comment">Post comment</string>
     <string name="go_to_comments"><u>Go to comments</u></string>
+    <string name="message">Message</string>
+    <string name="likes">likes</string>
 </resources>
