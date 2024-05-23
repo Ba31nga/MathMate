@@ -106,6 +106,7 @@
                         android:inputType="text"
                         android:gravity="top|start"
                         android:paddingStart="5dp"
+                        android:textColor="@color/white"
                         android:textColorHint="#979797"
                         android:textSize="12sp"
                         tools:ignore="RtlSymmetry" />
