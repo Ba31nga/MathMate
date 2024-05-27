@@ -5,12 +5,12 @@ import androidx.annotation.NonNull;
 import java.util.UUID;
 
 public class Forum {
-    public String id;
-    public String authorUid;
-    public String title;
-    public String subject;
-    public String description;
-    public String imageUri;
+    private String id;
+    private String authorUid;
+    private String title;
+    private String subject;
+    private String description;
+    private String imageUri;
 
 
     public Forum() {

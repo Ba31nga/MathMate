@@ -12,10 +12,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.UUID;
 
 public class Comment {
-    public String id;
-    public String forumId;
-    public String authorId;
-    public String message;
+    private String id;
+    private String forumId;
+    private String authorId;
+    private String message;
 
     public Comment() {
         id = "";
