@@ -97,6 +97,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         public void onClick(View v) {
                             // deletes the like
                             dataSnapshot.getRef().removeValue();
+                            CommentAdapter.this.notifyDataSetChanged();
+
+
                         }
                     });
                 }
@@ -114,6 +117,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        CommentAdapter.this.notifyDataSetChanged();
+
                                         // TODO : add notification to the user
                                     }
                                 }
