@@ -97,6 +97,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         public void onClick(View v) {
                             // deletes the like
                             dataSnapshot.getRef().removeValue();
+                            holder.like_btn.setImageResource(R.drawable.like);
                             CommentAdapter.this.notifyDataSetChanged();
 
 
