@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -196,40 +197,47 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         // adds like to the comment
                         @Override
                         public void onClick(View v) {
-                            Like like = new Like(currentUser.getUid());
+                            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(comment.getAuthorId())) {
+                                // making sure the user can't like himself
+                                Like like = new Like(currentUser.getUid());
 
-                            // adds the like reference to the realtime database
-                            FirebaseDatabase.getInstance().getReference("Likes").child(comment.getId()).child(currentUser.getUid()).setValue(like).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
+                                // adds the like reference to the realtime database
+                                FirebaseDatabase.getInstance().getReference("Likes").child(comment.getId()).child(currentUser.getUid()).setValue(like).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
 
-                                        // gives a point to the user created the command
-                                        giveUserPoint();
+                                            // gives a point to the user created the command
+                                            giveUserPoint();
 
-                                        comment.addLike();
-                                        CommentAdapter.this.notifyDataSetChanged();
+                                            comment.addLike();
+                                            CommentAdapter.this.notifyDataSetChanged();
 
-                                        // TODO : add notification to the user
+                                            // TODO : add notification to the user
+                                        }
                                     }
-                                }
 
-                                private void giveUserPoint() {
-                                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
-                                    Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
-                                    userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                            for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                                                dataSnapshot.getValue(User.class).addPoint();
-                                        }
+                                    private void giveUserPoint() {
+                                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+                                        Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
+                                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                                                    dataSnapshot.getValue(User.class).addPoint();
+                                            }
 
-                                        @Override
-                                        public void onCancelled(@NonNull DatabaseError error) {
-                                        }
-                                    });
-                                }
-                            });
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                            else {
+                                Toast.makeText(context, "You can't like yourself -_-", Toast.LENGTH_SHORT).show();
+                            }
+
                         }
                     });
                 }
