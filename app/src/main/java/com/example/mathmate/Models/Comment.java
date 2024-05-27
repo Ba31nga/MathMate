@@ -1,5 +1,14 @@
 package com.example.mathmate.Models;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.UUID;
 
 public class Comment {
@@ -7,6 +16,13 @@ public class Comment {
     public String forumId;
     public String authorId;
     public String message;
+
+    public Comment() {
+        id = "";
+        forumId = "";
+        authorId = "";
+        message = "";
+    }
 
     public Comment(String forumId, String authorId, String message) {
         UUID uuid = UUID.randomUUID();
@@ -43,4 +59,5 @@ public class Comment {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

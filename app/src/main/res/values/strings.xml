@@ -39,4 +39,6 @@
     <string name="go_to_comments"><u>Go to comments</u></string>
     <string name="message">Message</string>
     <string name="likes">likes</string>
+    <string name="comment_content">Comment content</string>
+    <string name="like_count">Like count</string>
 </resources>
