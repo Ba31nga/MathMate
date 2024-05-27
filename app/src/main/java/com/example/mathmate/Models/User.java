@@ -1,5 +1,17 @@
 package com.example.mathmate.Models;
 
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 public class User {
     private String username;
     private String bio;
@@ -50,23 +62,47 @@ public class User {
         return userPoints;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void addAnswers() {
+        questionAnswered++;
+        updateDatabase();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void RemoveAnswers() {
+        questionAnswered--;
+        updateDatabase();
     }
 
-    public void setBio(String bio) {
-        this.bio = bio;
+    public void addPoint() {
+        userPoints++;
+        updateDatabase();
     }
 
-    public void setQuestionAnswered(int questionAnswered) {
-        this.questionAnswered = questionAnswered;
+    public void removePoint() {
+        userPoints--;
+        updateDatabase();
     }
 
-    public void setUserPoints(int userPoints) {
-        this.userPoints = userPoints;
+    public void removePoint(int points) {
+        userPoints -= points;
+        updateDatabase();
     }
+
+    private void updateDatabase() {
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+        Query query = commentsRef.orderByChild("username").equalTo(username);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    DatabaseReference userRef = dataSnapshot.getRef();
+                    userRef.setValue(User.this);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
 }

@@ -25,6 +25,7 @@ import com.example.mathmate.Adapters.CommentAdapter;
 import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Comment;
 import com.example.mathmate.Models.Like;
+import com.example.mathmate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -100,11 +101,30 @@ public class CommentsActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Toast.makeText(CommentsActivity.this, "Comment was added successfully", Toast.LENGTH_SHORT).show();
 
+                    // adds more questions answered to the user
+                    addUserAnswerPoint();
+
                     // TODO : add notificaiton to the user
                 }
                 else {
                     Toast.makeText(CommentsActivity.this, "Something went wrong :(", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            private void addUserAnswerPoint() {
+                DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
+                Query userQuery = userReference.orderByKey().equalTo(currentUser.getUid());
+                userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                            dataSnapshot.getValue(User.class).addAnswers();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
             }
         });
 
@@ -126,6 +146,9 @@ public class CommentsActivity extends AppCompatActivity {
         commentsRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                comments.clear();
+                recyclerView.setAdapter(new CommentAdapter(comments, CommentsActivity.this));
+
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
                     comments.add(dataSnapshot.getValue(Comment.class));
                 recyclerView.setAdapter(new CommentAdapter(comments, CommentsActivity.this));

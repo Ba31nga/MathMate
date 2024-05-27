@@ -16,12 +16,14 @@ public class Comment {
     private String forumId;
     private String authorId;
     private String message;
+    private int likes;
 
     public Comment() {
         id = "";
         forumId = "";
         authorId = "";
         message = "";
+        likes = 0;
     }
 
     public Comment(String forumId, String authorId, String message) {
@@ -30,6 +32,26 @@ public class Comment {
         this.forumId = forumId;
         this.authorId = authorId;
         this.message = message;
+        likes = 0;
+    }
+
+    public void addLike() {
+        likes++;
+        updateDatabase();
+    }
+
+    public void removeLike() {
+        likes--;
+        updateDatabase();
+    }
+
+    private void updateDatabase() {
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+        commentsRef.child(forumId).child(id).setValue(this);
+    }
+
+    public int getLikes() {
+        return likes;
     }
 
     public String getId() {
