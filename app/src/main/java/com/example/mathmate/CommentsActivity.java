@@ -24,7 +24,9 @@ import com.bumptech.glide.Glide;
 import com.example.mathmate.Adapters.CommentAdapter;
 import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Comment;
+import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.Like;
+import com.example.mathmate.Models.Notification;
 import com.example.mathmate.Models.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +41,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class CommentsActivity extends AppCompatActivity {
     private TextView username;
@@ -105,11 +108,68 @@ public class CommentsActivity extends AppCompatActivity {
                     addUserAnswerPoint();
                     message.setText("");
 
-                    // TODO : add notificaiton to the user
+                    // gives the user a notification that he got answered
+                    addNotification(comment);
                 }
                 else {
                     Toast.makeText(CommentsActivity.this, "Something went wrong :(", Toast.LENGTH_SHORT).show();
                 }
+            }
+
+            private void addNotification(Comment comment) {
+                // First let's take the information about what question was answered and the name of the user who answered it
+
+                DatabaseReference forumReference = FirebaseDatabase.getInstance().getReference("Forums");
+                Query forumQuery = forumReference.orderByKey().equalTo(forumId);
+                forumQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            // The forum that was answered
+                            Forum forum = dataSnapshot.getValue(Forum.class);
+                            String forumTitle = forum.getTitle();
+
+                            DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
+                            Query userQuery = userReference.orderByKey().equalTo(comment.getAuthorId());
+                            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                                        // The user that answered the question
+                                        User user = dataSnapshot1.getValue(User.class);
+                                        String username = user.getUsername();
+                                        String id = dataSnapshot1.getKey();
+
+
+                                        assert id != null;
+                                        if (!id.equals(forum.getAuthorUid())) {
+                                            // prevents the user from sending notifications to himself
+                                            String notificationMessage = username + " has answered your question : " + forumTitle;
+                                            Notification notification = new Notification(notificationMessage, forumId);
+
+                                            DatabaseReference notificationReference = FirebaseDatabase.getInstance().getReference("Notifications");
+                                            notificationReference.child(forum.getAuthorUid()).child(comment.getId()).setValue(notification).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    // TODO SEND NOTIFICATION TO USER
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+
             }
 
             private void addUserAnswerPoint() {

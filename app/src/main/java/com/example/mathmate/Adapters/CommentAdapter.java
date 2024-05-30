@@ -19,8 +19,6 @@ import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.Like;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -45,7 +43,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.comment, parent, false);
-        return new CommentAdapter.ViewHolder(v);
+        return new ViewHolder(v);
     }
 
     @Override
@@ -70,12 +68,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
         // handling delete button
         deleteCommentHandler(holder, comment);
-
-
-
-
-
     }
+
 
     private void deleteCommentHandler(ViewHolder holder, Comment comment) {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -83,69 +77,111 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         if (currentUser.getUid().equals(comment.getAuthorId())) {
             // Checks if the current user is the writer of the comment
             holder.delete_btn.setVisibility(View.VISIBLE);
-            holder.delete_btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
-                    Query commentsQuery = commentsRef.child(comment.getForumId()).orderByKey().equalTo(comment.getId());
+            holder.delete_btn.setOnClickListener(v -> {
 
-                    commentsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        // Deletes the comment
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                            {
-                                removeUserAnswerPoint();
-                                dataSnapshot.getRef().removeValue();
-                            }
-                        }
-
-                        private void removeUserAnswerPoint() {
-                            DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
-                            Query userQuery = userReference.orderByKey().equalTo(currentUser.getUid());
-                            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                                    {
-                                        User user = dataSnapshot.getValue(User.class);
-                                        user.RemoveAnswers();
-                                        user.removePoint(comment.getLikes());
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-
-
-
-                    DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference("Likes");
-                    Query likesQuery = likesRef.orderByKey().equalTo(comment.getId());
-                    likesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        // removes the likes that are connected to the deleted comment
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                                dataSnapshot.getRef().removeValue();
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-
-                }
+                removeCommentFromDatabase(comment);
+                removeAnswerPointsFromUser(comment);
+                removeLikesFromDatabase(comment);
+                removeNotificationsRelatedToTheComment(comment);
             });
         }
     }
+
+    private void removeNotificationsRelatedToTheComment(Comment comment) {
+        // deletes all notifications regarding to that comment
+        DatabaseReference forumRef = FirebaseDatabase.getInstance().getReference("Forums");
+        Query forumQuery = forumRef.orderByKey().equalTo(comment.getForumId());
+        forumQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Forum forum = dataSnapshot.getValue(Forum.class);
+
+                    DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications");
+                    Query notificationsQuery = notificationRef.child(forum.getAuthorUid()).orderByKey().equalTo(comment.getId());
+                    notificationsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                                // removes the notification related to that comment
+                                dataSnapshot1.getRef().removeValue();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+
+    }
+
+    private void removeLikesFromDatabase(Comment comment) {
+        DatabaseReference likesRef = FirebaseDatabase.getInstance().getReference("Likes");
+        Query likesQuery = likesRef.orderByKey().equalTo(comment.getId());
+        likesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            // removes the likes that are connected to the deleted comment
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                    dataSnapshot.getRef().removeValue();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void removeCommentFromDatabase(Comment comment) {
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+        Query commentsQuery = commentsRef.child(comment.getForumId()).orderByKey().equalTo(comment.getId());
+        commentsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            // Deletes the comment
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                {
+                    dataSnapshot.getRef().removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+    }
+
+    private void removeAnswerPointsFromUser(Comment comment) {
+        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
+        Query userQuery = userReference.orderByKey().equalTo(comment.getAuthorId());
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                {
+                    User user = dataSnapshot.getValue(User.class);
+                    user.RemoveAnswers();
+                    user.removePoint(comment.getLikes());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+
+
+
 
     private void likesHandler(ViewHolder holder, Comment comment) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes");
@@ -161,84 +197,46 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                     // the current user already liked the comment
 
                     isLiked = true;
+                    // the user already liked the comment
                     holder.like_btn.setImageResource(R.drawable.like_active);
-                    holder.like_btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // deletes the like
-                            dataSnapshot.getRef().removeValue();
-                            comment.removeLike();
-                            removeUserPoints();
-                            holder.like_btn.setImageResource(R.drawable.like);
-                            CommentAdapter.this.notifyDataSetChanged();
-                        }
+                    holder.like_btn.setOnClickListener(v -> {
+                        // deletes the like from the database
+                        dataSnapshot.getRef().removeValue();
+                        // removes 1 like from the comment like attribute
+                        comment.removeLike();
+                        // removes the points related to that like from the user
+                        removeOnePointFromUser(comment);
+                        // changes the like icon
+                        holder.like_btn.setImageResource(R.drawable.like);
+                        CommentAdapter.this.notifyDataSetChanged();
+                    });
+                }
+                if (!isLiked) {
+                    // the current user haven't liked the comment yet
+                    // adds like to the comment
+                    holder.like_btn.setOnClickListener(v -> {
+                        if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(comment.getAuthorId())) {
+                            // making sure the user can't like himself
+                            Like like = new Like(currentUser.getUid());
 
-                        private void removeUserPoints() {
-                            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
-                            Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
-                            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                                        dataSnapshot.getValue(User.class).removePoint();
-                                }
+                            // adds the like reference to the realtime database
+                            FirebaseDatabase.getInstance().getReference("Likes").child(comment.getId()).child(currentUser.getUid()).setValue(like).addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
+                                    // gives a point to the user created the command
+                                    giveUserPoint(comment);
+                                    // adds one like to the comment like attribute
+                                    comment.addLike();
+                                    CommentAdapter.this.notifyDataSetChanged();
+
+                                    // TODO : add notification to the user
                                 }
                             });
                         }
-                    });
-                }
-
-                if (!isLiked) {
-                    // the current user didn't liked the comment yet
-                    holder.like_btn.setOnClickListener(new View.OnClickListener() {
-                        // adds like to the comment
-                        @Override
-                        public void onClick(View v) {
-                            if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(comment.getAuthorId())) {
-                                // making sure the user can't like himself
-                                Like like = new Like(currentUser.getUid());
-
-                                // adds the like reference to the realtime database
-                                FirebaseDatabase.getInstance().getReference("Likes").child(comment.getId()).child(currentUser.getUid()).setValue(like).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-
-                                            // gives a point to the user created the command
-                                            giveUserPoint();
-
-                                            comment.addLike();
-                                            CommentAdapter.this.notifyDataSetChanged();
-
-                                            // TODO : add notification to the user
-                                        }
-                                    }
-
-                                    private void giveUserPoint() {
-                                        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
-                                        Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
-                                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                                                    dataSnapshot.getValue(User.class).addPoint();
-                                            }
-
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError error) {
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                            else {
-                                Toast.makeText(context, "You can't like yourself -_-", Toast.LENGTH_SHORT).show();
-                            }
-
+                        else {
+                            Toast.makeText(context, "You can't like yourself -_-", Toast.LENGTH_SHORT).show();
                         }
+
                     });
                 }
             }
@@ -248,6 +246,41 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             }
         });
     }
+
+    private void giveUserPoint(Comment comment) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+        Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot1) {
+                for (DataSnapshot dataSnapshot : snapshot1.getChildren())
+                    dataSnapshot.getValue(User.class).addPoint();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void removeOnePointFromUser(Comment comment) {
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+        Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren())
+                    dataSnapshot.getValue(User.class).removePoint();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+
+
 
     private void displayUserData(ViewHolder holder, Comment comment) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
@@ -270,12 +303,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         });
     }
 
+
+
     @Override
     public int getItemCount() {
         return comments.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView username, comment_content, like_count;
         public ImageView profile_picture;
