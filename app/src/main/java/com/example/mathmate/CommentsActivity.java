@@ -103,6 +103,7 @@ public class CommentsActivity extends AppCompatActivity {
 
                     // adds more questions answered to the user
                     addUserAnswerPoint();
+                    message.setText("");
 
                     // TODO : add notificaiton to the user
                 }
