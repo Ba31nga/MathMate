@@ -197,8 +197,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                     // the current user already liked the comment
 
                     isLiked = true;
-                    // the user already liked the comment
                     holder.like_btn.setImageResource(R.drawable.like_active);
+
+                    // the current user clicks on the like button
                     holder.like_btn.setOnClickListener(v -> {
                         // deletes the like from the database
                         dataSnapshot.getRef().removeValue();
@@ -208,6 +209,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                         removeOnePointFromUser(comment);
                         // changes the like icon
                         holder.like_btn.setImageResource(R.drawable.like);
+                        // updates the adapter
                         CommentAdapter.this.notifyDataSetChanged();
                     });
                 }
@@ -228,12 +230,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                                     // adds one like to the comment like attribute
                                     comment.addLike();
                                     CommentAdapter.this.notifyDataSetChanged();
-
-                                    // TODO : add notification to the user
                                 }
                             });
                         }
                         else {
+                            // if the user tries to like himself...
                             Toast.makeText(context, "You can't like yourself -_-", Toast.LENGTH_SHORT).show();
                         }
 
@@ -248,6 +249,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     private void giveUserPoint(Comment comment) {
+        // a function that gives the user wrote the comment a point
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
         Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
         userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -264,6 +266,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     private void removeOnePointFromUser(Comment comment) {
+        // a function that removes 1 point from the user that wrote the comment
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Registered Users");
         Query userQuery = userRef.orderByKey().equalTo(comment.getAuthorId());
         userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -281,8 +284,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
 
 
-
     private void displayUserData(ViewHolder holder, Comment comment) {
+        // displays the user data on the comment view
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
         Query query = reference.orderByKey().equalTo(comment.getAuthorId());
         query.addListenerForSingleValueEvent(new ValueEventListener() {

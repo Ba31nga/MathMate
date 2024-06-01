@@ -2,8 +2,10 @@ package com.example.mathmate.Profile;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -18,6 +20,13 @@ import com.example.mathmate.Fragments.NotificationsFragment;
 import com.example.mathmate.Fragments.ProfileFragment;
 import com.example.mathmate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -38,8 +47,10 @@ public class HomeActivity extends AppCompatActivity {
 
 
         replaceFragment(new ProfileFragment());
-
         bottom_nav_bar = findViewById(R.id.bottomNavigationView);
+
+        checkForNotifications();
+
         bottom_nav_bar.setOnItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.profile) {
                 replaceFragment(new ProfileFragment());
@@ -54,7 +65,34 @@ public class HomeActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
 
+    private void checkForNotifications() {
+        // checks if the user has notifications
+        DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
+        Query notificationsQuery = notificationsRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        notificationsQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                boolean hasNotifications = false;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // has notifications
+                    hasNotifications = true;
+                    break;
+                }
+
+                if (hasNotifications) {
+                    bottom_nav_bar.getMenu().getItem(3).setIcon(R.drawable.notification_active);
+                } else {
+                    bottom_nav_bar.getMenu().getItem(3).setIcon(R.drawable.notifications);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private void replaceFragment(Fragment fragment) {
