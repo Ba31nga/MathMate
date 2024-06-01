@@ -23,6 +23,7 @@ firebaseDatabase = "21.0.0"
 firebaseStorage = "21.0.0"
 mathview = "0.0.6"
 firebaseMessaging = "24.0.0"
+touchimageview = "1.4.1"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -48,6 +49,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 mathview = { module = "io.github.kexanie.library:MathView", version.ref = "mathview" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseMessaging" }
+touchimageview = { module = "com.github.MikeOrtiz:TouchImageView", version.ref = "touchimageview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
