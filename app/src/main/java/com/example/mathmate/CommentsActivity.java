@@ -1,9 +1,7 @@
 package com.example.mathmate;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -22,14 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Adapters.CommentAdapter;
-import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Models.Comment;
 import com.example.mathmate.Models.Forum;
-import com.example.mathmate.Models.Like;
 import com.example.mathmate.Models.Notification;
 import com.example.mathmate.Models.User;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,10 +34,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 public class CommentsActivity extends AppCompatActivity {
     private TextView username;
@@ -76,9 +67,7 @@ public class CommentsActivity extends AppCompatActivity {
         comments = new ArrayList<>();
 
         ImageButton go_back_btn = findViewById(R.id.back_btn);
-        go_back_btn.setOnClickListener(v -> {
-            finish();
-        });
+        go_back_btn.setOnClickListener(v -> finish());
 
         forumId = getIntent().getStringExtra("forumid");
 
@@ -100,22 +89,19 @@ public class CommentsActivity extends AppCompatActivity {
         Comment comment = new Comment(forumId, currentUser.getUid(), message.getText().toString());
         DatabaseReference referenceComments = FirebaseDatabase.getInstance().getReference("Comments");
         // Adding the comment to the realtime database
-        referenceComments.child(forumId).child(comment.getId()).setValue(comment).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Toast.makeText(CommentsActivity.this, "Comment was added successfully", Toast.LENGTH_SHORT).show();
+        referenceComments.child(forumId).child(comment.getId()).setValue(comment).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(CommentsActivity.this, "Comment was added successfully", Toast.LENGTH_SHORT).show();
 
-                    // adds more questions answered to the user
-                    addUserAnswerPoint();
-                    message.setText("");
+                // adds more questions answered to the user
+                addUserAnswerPoint();
+                message.setText("");
 
-                    // gives the user a notification that he got answered
-                    addNotification(comment);
-                }
-                else {
-                    Toast.makeText(CommentsActivity.this, "Something went wrong :(", Toast.LENGTH_SHORT).show();
-                }
+                // gives the user a notification that he got answered
+                addNotification(comment);
+            }
+            else {
+                Toast.makeText(CommentsActivity.this, "Something went wrong :(", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -147,7 +133,6 @@ public class CommentsActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     // The forum that was answered
                     Forum forum = dataSnapshot.getValue(Forum.class);
-                    String forumTitle = forum.getTitle();
 
                     DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
                     Query userQuery = userReference.orderByKey().equalTo(comment.getAuthorId());
@@ -168,12 +153,7 @@ public class CommentsActivity extends AppCompatActivity {
                                     Notification notification = new Notification(notificationMessage, forumId, comment.getId());
 
                                     DatabaseReference notificationReference = FirebaseDatabase.getInstance().getReference("Notifications");
-                                    notificationReference.child(forum.getAuthorUid()).child(comment.getId()).setValue(notification).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            // TODO SEND NOTIFICATION TO USER
-                                        }
-                                    });
+                                    notificationReference.child(forum.getAuthorUid()).child(comment.getId()).setValue(notification).addOnCompleteListener(task -> sendNotificationToDevice(user));
                                 }
                             }
                         }
@@ -192,7 +172,9 @@ public class CommentsActivity extends AppCompatActivity {
 
     }
 
+    private void sendNotificationToDevice(User user) {
 
+    }
 
 
     private void showInformation() {
@@ -215,12 +197,7 @@ public class CommentsActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren())
                     comments.add(dataSnapshot.getValue(Comment.class));
 
-                Collections.sort(comments, new Comparator<Comment>() {
-                    @Override
-                    public int compare(Comment o1, Comment o2) {
-                        return Integer.compare(o2.getLikes(), o1.getLikes());
-                    }
-                });
+                comments.sort((o1, o2) -> Integer.compare(o2.getLikes(), o1.getLikes()));
                 recyclerView.setAdapter(new CommentAdapter(comments, CommentsActivity.this));
             }
 
