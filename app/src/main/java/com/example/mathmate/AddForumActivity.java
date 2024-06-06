@@ -17,15 +17,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -33,7 +29,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 public class AddForumActivity extends AppCompatActivity {
 
@@ -44,7 +39,6 @@ public class AddForumActivity extends AppCompatActivity {
 
     private ImageButton backBTN;
     private ImageView forumImage, uploadImage;
-    private Button continueBTN, takePhotoBTN, browseGalleryBTN;
     private Uri uriImage;
     private ActivityResultLauncher<Uri> takePictureLauncher;
     private EditText titleET, subjectET;
@@ -71,8 +65,9 @@ public class AddForumActivity extends AppCompatActivity {
         backBTN = findViewById(R.id.go_back_btn);
         backBTN.setOnClickListener(v -> finish());
 
-        takePhotoBTN = findViewById(R.id.take_photo_btn);
-        browseGalleryBTN = findViewById(R.id.browse_gallery_btn);
+
+        Button takePhotoBTN = findViewById(R.id.take_photo_btn);
+        Button browseGalleryBTN = findViewById(R.id.browse_gallery_btn);
 
         // Adding photo to the forum
         browseGalleryBTN.setOnClickListener(v -> openFileChooser());
@@ -83,7 +78,7 @@ public class AddForumActivity extends AppCompatActivity {
 
 
         // Passing the necessary information to the next activity
-        continueBTN = findViewById(R.id.continue_btn);
+        Button continueBTN = findViewById(R.id.continue_btn);
         continueBTN.setOnClickListener(v -> {
             if (TextUtils.isEmpty(titleET.getText().toString())){
                 titleET.setError("Title is required");
@@ -105,16 +100,20 @@ public class AddForumActivity extends AppCompatActivity {
 
 
     private void capturePicture() {
+        // opens the camera
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
     }
 
     private void checkCameraPermissionAndOpenCamera() {
+        // checks for camera permissions
         if (ActivityCompat.checkSelfPermission(AddForumActivity.this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
+            // the user didn't allow to open camera
             ActivityCompat.requestPermissions(AddForumActivity.this,
                     new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
         } else {
+            // the user allowed to open camera
             capturePicture();
         }
     }

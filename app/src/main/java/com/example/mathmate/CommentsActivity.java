@@ -7,7 +7,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -34,7 +33,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -119,12 +117,7 @@ public class CommentsActivity extends AppCompatActivity {
                     Comment comment = dataSnapshot.getValue(Comment.class);
                     comments.add(comment);
                 }
-                comments.sort(new Comparator<Comment>() {
-                    @Override
-                    public int compare(Comment o1, Comment o2) {
-                        return Integer.compare(o2.getLikes(), o1.getLikes());
-                    }
-                });
+                comments.sort((o1, o2) -> Integer.compare(o2.getLikes(), o1.getLikes()));
 
                 updateAdapter();
             }
@@ -176,37 +169,32 @@ public class CommentsActivity extends AppCompatActivity {
     private void addNotification(Comment comment) {
         // First let's take the information about what question was answered and the name of the user who answered it
 
-        DatabaseReference forumReference = FirebaseDatabase.getInstance().getReference("Forums");
-        Query forumQuery = forumReference.orderByKey().equalTo(forumId);
+        DatabaseReference forumRef = FirebaseDatabase.getInstance().getReference("Forums");
+        Query forumQuery = forumRef.child(forumId);
         forumQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    // The forum that was answered
-                    Forum forum = dataSnapshot.getValue(Forum.class);
+                // The forum that was answered
+                Forum forum = snapshot.getValue(Forum.class);
+                assert forum != null;
+                if (!forum.getAuthorUid().equals(comment.getAuthorId())) {
+                    // the author of the comment is not the author of the forum
 
-                    DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
-                    Query userQuery = userReference.orderByKey().equalTo(comment.getAuthorId());
-                    userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                    // getting the name of the author of the comment
+                    DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("Registered Users");
+                    Query usersQuery = usersRef.child(comment.getAuthorId());
+                    usersQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
-                                // The user that answered the question
-                                User user = dataSnapshot1.getValue(User.class);
-                                String username = user.getUsername();
-                                String id = dataSnapshot1.getKey();
+                            User author_of_comment = snapshot.getValue(User.class);
+                            assert author_of_comment != null;
+                            String username = author_of_comment.getUsername();
 
-
-                                assert id != null;
-                                if (!id.equals(forum.getAuthorUid())) {
-                                    // prevents the user from sending notifications to himself
-                                    String notificationMessage = username + " has answered your question" ;
-                                    Notification notification = new Notification(notificationMessage, forumId, comment.getId());
-
-                                    DatabaseReference notificationReference = FirebaseDatabase.getInstance().getReference("Notifications");
-                                    notificationReference.child(forum.getAuthorUid()).child(comment.getId()).setValue(notification).addOnCompleteListener(task -> sendNotificationToDevice(user));
-                                }
-                            }
+                            // adds the notification for the author of the forum
+                            String text = username + " has answered your question : " + forum.getTitle();
+                            Notification notification = new Notification(text, forumId, comment.getId());
+                            DatabaseReference notificationRef = FirebaseDatabase.getInstance().getReference("Notifications");
+                            notificationRef.child(forum.getAuthorUid()).child(comment.getId()).setValue(notification);
                         }
 
                         @Override
@@ -214,16 +202,13 @@ public class CommentsActivity extends AppCompatActivity {
                         }
                     });
                 }
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
-
-    }
-
-    private void sendNotificationToDevice(User user) {
 
     }
 
