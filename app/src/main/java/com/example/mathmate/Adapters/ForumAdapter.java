@@ -75,6 +75,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
 
 
         holder.itemView.setOnClickListener(v -> {
+            // when the forum is clicked, it transfers the user to a forum fragment
             SharedPreferences.Editor editor = context.getSharedPreferences("PREPS", context.MODE_PRIVATE).edit();
             editor.putString("forumid", forum.getId());
             editor.apply();

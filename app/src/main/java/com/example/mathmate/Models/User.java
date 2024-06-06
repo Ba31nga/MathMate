@@ -67,13 +67,13 @@ public class User {
         updateDatabase();
     }
 
-    public void RemoveAnswers() {
+    public void removeAnswers() {
         questionAnswered--;
         updateDatabase();
     }
 
-    public void addPoint() {
-        userPoints++;
+    public void addPoint(int x) {
+        userPoints += x;
         updateDatabase();
     }
 

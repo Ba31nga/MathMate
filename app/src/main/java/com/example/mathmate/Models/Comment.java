@@ -1,22 +1,15 @@
 package com.example.mathmate.Models;
 
-import androidx.annotation.NonNull;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.Comparator;
 import java.util.UUID;
 
 public class Comment {
-    private String id;
-    private String forumId;
-    private String authorId;
-    private String message;
+    private final String id;
+    private final String forumId;
+    private final String authorId;
+    private final String message;
     private int likes;
 
     public Comment() {
@@ -71,16 +64,5 @@ public class Comment {
         return message;
     }
 
-    public void setForumId(String forumId) {
-        this.forumId = forumId;
-    }
-
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
 }

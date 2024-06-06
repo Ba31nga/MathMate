@@ -34,17 +34,29 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CommentsActivity extends AppCompatActivity {
+
+
+    // Views that are related to the "writing a comment" section
     private TextView username;
     private ImageView profile_picture;
     private FirebaseUser currentUser;
 
     private EditText message;
-    private String forumId;
+
+
+    // recycler view for the list of comments
+
     private RecyclerView recyclerView;
     private List<Comment> comments;
+    private CommentAdapter commentAdapter;
+
+
+    // forum id that the comments section are related to
+    private String forumId;
 
 
     @Override
@@ -58,22 +70,34 @@ public class CommentsActivity extends AppCompatActivity {
             return insets;
         });
 
+        // current logged user
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        // comment views
         username = findViewById(R.id.username);
         profile_picture = findViewById(R.id.profile_picture);
         message = findViewById(R.id.comment_input);
-        Button post_btn = findViewById(R.id.post_btn);
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        recyclerView = findViewById(R.id.recyclerView);
-        comments = new ArrayList<>();
 
+        // initiating the recycler view and the comments adapter
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(CommentsActivity.this));
+        comments = new ArrayList<>();
+        commentAdapter = new CommentAdapter(comments, CommentsActivity.this);
+
+        // go back button
         ImageButton go_back_btn = findViewById(R.id.back_btn);
         go_back_btn.setOnClickListener(v -> finish());
 
+        // the id of the forum that the comment section is related to
         forumId = getIntent().getStringExtra("forumid");
 
-        // showing the information on the screen
-        showInformation();
+        // showing the information on the "write a comment" section
+        showUserInformation();
+        // showing the lists of the comments related to the forum
+        showComments();
 
+        // "post comment" button
+        Button post_btn = findViewById(R.id.post_btn);
         post_btn.setOnClickListener(v -> {
             if (TextUtils.isEmpty(message.getText())){
                 message.setError("You must write something");
@@ -85,35 +109,62 @@ public class CommentsActivity extends AppCompatActivity {
         });
     }
 
-    private void addComment() {
-        Comment comment = new Comment(forumId, currentUser.getUid(), message.getText().toString());
-        DatabaseReference referenceComments = FirebaseDatabase.getInstance().getReference("Comments");
-        // Adding the comment to the realtime database
-        referenceComments.child(forumId).child(comment.getId()).setValue(comment).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(CommentsActivity.this, "Comment was added successfully", Toast.LENGTH_SHORT).show();
+    private void showComments() {
+        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments");
+        commentsRef.child(forumId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                comments.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Comment comment = dataSnapshot.getValue(Comment.class);
+                    comments.add(comment);
+                }
+                comments.sort(new Comparator<Comment>() {
+                    @Override
+                    public int compare(Comment o1, Comment o2) {
+                        return Integer.compare(o2.getLikes(), o1.getLikes());
+                    }
+                });
 
-                // adds more questions answered to the user
-                addUserAnswerPoint();
-                message.setText("");
-
-                // gives the user a notification that he got answered
-                addNotification(comment);
+                updateAdapter();
             }
-            else {
-                Toast.makeText(CommentsActivity.this, "Something went wrong :(", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
             }
         });
     }
 
+    private void updateAdapter() {
+        commentAdapter = new CommentAdapter(comments, CommentsActivity.this);
+        recyclerView.setAdapter(commentAdapter);
+    }
+
+    private void addComment() {
+        Comment comment = new Comment(forumId, currentUser.getUid(), message.getText().toString());
+        DatabaseReference referenceComments = FirebaseDatabase.getInstance().getReference("Comments");
+        // Adding the comment to the realtime database
+        referenceComments.child(forumId).child(comment.getId()).setValue(comment);
+
+        // adds more questions answered to the user
+        addUserAnswerPoint();
+
+        // resets the message box
+        message.setText("");
+
+        // gives the user a notification that he got answered
+        addNotification(comment);
+    }
+
     private void addUserAnswerPoint() {
         DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
-        Query userQuery = userReference.orderByKey().equalTo(currentUser.getUid());
+        Query userQuery = userReference.child(currentUser.getUid());
         userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    dataSnapshot.getValue(User.class).addAnswers();
+                User user = snapshot.getValue(User.class);
+                assert user != null;
+                user.addAnswers();
             }
 
             @Override
@@ -177,34 +228,10 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
 
-    private void showInformation() {
+    private void showUserInformation() {
         assert currentUser != null;
         username.setText(currentUser.getDisplayName());
         Glide.with(this).load(currentUser.getPhotoUrl()).placeholder(R.drawable.default_pfp).into(profile_picture);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(CommentsActivity.this));
-
-
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Comments").child(forumId);
-
-        // Displaying all the comments
-        commentsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                comments.clear();
-                recyclerView.setAdapter(new CommentAdapter(comments, CommentsActivity.this));
-
-                for (DataSnapshot dataSnapshot : snapshot.getChildren())
-                    comments.add(dataSnapshot.getValue(Comment.class));
-
-                comments.sort((o1, o2) -> Integer.compare(o2.getLikes(), o1.getLikes()));
-                recyclerView.setAdapter(new CommentAdapter(comments, CommentsActivity.this));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
     }
 
 
