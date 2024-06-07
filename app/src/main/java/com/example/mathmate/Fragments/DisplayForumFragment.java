@@ -97,11 +97,7 @@ public class DisplayForumFragment extends Fragment {
                         Uri forumImage = Uri.parse(forum.getImageUri());
 
                         Glide.with(getContext()).load(pfp).placeholder(R.drawable.default_pfp).into(profile_picture);
-                        if (pfp.equals(Uri.EMPTY)) {
-                            forum_picture.setVisibility(View.GONE);
-                        } else {
-                            Glide.with(getContext()).load(forumImage).placeholder(R.drawable.blankscreen).into(forum_picture);
-                        }
+                        Glide.with(getContext()).load(forumImage).placeholder(R.drawable.blankscreen).into(forum_picture);
 
                         // putting all the information on the text views
                         title.setText(forum.getTitle());
@@ -115,7 +111,8 @@ public class DisplayForumFragment extends Fragment {
                         subject.setVisibility(View.VISIBLE);
                         description.setVisibility(View.VISIBLE);
                         profile_picture.setVisibility(View.VISIBLE);
-                        forum_picture.setVisibility(View.VISIBLE);
+                        if (!forum.getImageUri().isEmpty())
+                            forum_picture.setVisibility(View.VISIBLE);
                         go_to_comments_btn.setVisibility(View.VISIBLE);
                     }
 

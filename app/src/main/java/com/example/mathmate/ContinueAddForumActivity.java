@@ -72,15 +72,29 @@ public class ContinueAddForumActivity extends AppCompatActivity {
 
         Button submitBTN = findViewById(R.id.submit_btn);
         submitBTN.setOnClickListener(v -> {
-            if (descriptionET.getText().length() < 200) {
-                descriptionET.setError("Your question should have a description of at least 200 words");
+            if (descriptionET.getText().toString().isEmpty()) {
+                descriptionET.setError("This is a mandatory");
                 descriptionET.requestFocus();
-            } else {
+            } else if (!uriImage.isEmpty()) {
+                // stores the image on the cloud
                 uploadImage();
+            } else {
+                // if does not have an image, it does not upload it to the cloud and stores it only on the realtime database
+                uploadForumWithoutImage();
             }
         });
 
 
+    }
+
+    private void uploadForumWithoutImage() {
+        Forum forum = new Forum(title, subject, descriptionET.getText().toString(), uriImage, firebaseUser.getUid());
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Forums");
+        reference.child(forum.getId()).setValue(forum);
+
+        Intent intent = new Intent(ContinueAddForumActivity.this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
     }
 
     private void uploadImage() {

@@ -2,13 +2,11 @@ package com.example.mathmate.Fragments;
 
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,12 +20,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 
 public class ForumsFragment extends Fragment {
@@ -37,7 +33,7 @@ public class ForumsFragment extends Fragment {
     private RecyclerView recyclerView;
 
     // vars
-    private List<Forum> mForumList;
+    private List<Forum> forums;
     private DatabaseReference database;
     private ForumAdapter adapter;
 
@@ -54,7 +50,7 @@ public class ForumsFragment extends Fragment {
         recyclerView = v.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        mForumList = new ArrayList<>();
+        forums = new ArrayList<>();
 
         readForums();
         search_bar.addTextChangedListener(new TextWatcher() {
@@ -65,7 +61,7 @@ public class ForumsFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchForums(s.toString().toLowerCase(), "title");
+                searchForums(s.toString().toLowerCase());
             }
 
             @Override
@@ -80,16 +76,16 @@ public class ForumsFragment extends Fragment {
         return v;
     }
 
-    private void searchForums(String s, String parameter) {
-        Query query = database.orderByChild(parameter).startAt(s).endAt(s + "\uf8ff");
-
-        query.addValueEventListener(new ValueEventListener() {
+    private void searchForums(String s) {
+        database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                mForumList.clear();
+                forums.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Forum forum = dataSnapshot.getValue(Forum.class);
-                    mForumList.add(forum);
+                    assert forum != null;
+                    if (forum.getTitle().toLowerCase().startsWith(s) || forum.getSubject().toLowerCase().startsWith(s))
+                        forums.add(forum);
                 }
                 updateForumList();
             }
@@ -106,10 +102,10 @@ public class ForumsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (search_bar.getText().toString().isEmpty()) {
-                    mForumList.clear();
+                    forums.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         Forum forum = dataSnapshot.getValue(Forum.class);
-                        mForumList.add(forum);
+                        forums.add(forum);
                     }
                     updateForumList();
                 }
@@ -126,7 +122,7 @@ public class ForumsFragment extends Fragment {
 
 
     private void updateForumList() {
-        adapter = new ForumAdapter(mForumList, getContext());
+        adapter = new ForumAdapter(forums, getContext());
         recyclerView.setAdapter(adapter);
     }
 
