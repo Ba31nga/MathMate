@@ -1,15 +1,9 @@
 package com.example.mathmate.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +12,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Adapters.ForumAdapter;
@@ -37,7 +36,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -45,10 +43,11 @@ public class ProfileFragment extends Fragment {
 
     // widgets
 
-    private TextView username_tv, bio_tv, QA_tv, points_tv;
-    private ImageView pfp;
+    private TextView username_tv, bio_tv, QA_tv, points_tv, your_username, your_score, your_rank;
+    private ImageView pfp, your_pfp;
     private ProgressBar progressBar;
     private RecyclerView forumRecycler, userRecycler;
+    private View your_info;
 
     // vars
 
@@ -62,44 +61,57 @@ public class ProfileFragment extends Fragment {
 
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        // the info on the top of the screen
         username_tv = v.findViewById(R.id.username_tv);
         bio_tv = v.findViewById(R.id.bio_tv);
         QA_tv = v.findViewById(R.id.QA_tv);
         points_tv = v.findViewById(R.id.points_tv);
-        progressBar = v.findViewById(R.id.progressBar);
+        pfp = v.findViewById(R.id.pfp);
 
+        // authentication
+        authProfile = FirebaseAuth.getInstance();
+        firebaseUser = authProfile.getCurrentUser();
+
+        // your info under the leaderboard
+        your_username = v.findViewById(R.id.username);
+        your_pfp = v.findViewById(R.id.profile_picture);
+        your_rank = v.findViewById(R.id.rank);
+        your_score = v.findViewById(R.id.score);
+        your_info = v.findViewById(R.id.your_info);
+        your_username.setText("Your score");
+        Glide.with(getContext()).load(firebaseUser.getPhotoUrl()).placeholder(R.drawable.default_pfp).into(your_pfp);
+
+        // recycler views + their settings
         forumRecycler = v.findViewById(R.id.forumRecycler);
         forumRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        forumRecycler.addItemDecoration(new DividerItemDecoration(forumRecycler.getContext(), DividerItemDecoration.VERTICAL));
         forums = new ArrayList<>();
 
         userRecycler = v.findViewById(R.id.userRecycler);
         userRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        userRecycler.addItemDecoration(new DividerItemDecoration(userRecycler.getContext(), DividerItemDecoration.VERTICAL));
         users = new ArrayList<>();
 
-
+        // progress bar
+        progressBar = v.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        // buttons
         ImageButton logout_btn = v.findViewById(R.id.logout_btn);
         ImageButton settings_btn = v.findViewById(R.id.settings_btn);
 
-        pfp = v.findViewById(R.id.pfp);
-
-        authProfile = FirebaseAuth.getInstance();
-        firebaseUser = authProfile.getCurrentUser();
-
+        // transfers the user to an activity where he can change his profile picture
         pfp.setOnClickListener(v12 -> {
             Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
             startActivity(intent);
 
         });
 
+        // logging out the user from his account
         logout_btn.setOnClickListener(v1 -> {
             authProfile.signOut();
 
@@ -111,13 +123,47 @@ public class ProfileFragment extends Fragment {
         if (firebaseUser == null) {
             Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         } else {
+            // shows the data on the screen
             showUserProfile(firebaseUser);
+            // handles the recycler views
             setUpForumRecycler();
             setUpUserRecycler();
+            infoShowingHandler();
         }
 
 
         return v;
+    }
+
+    private void infoShowingHandler() {
+        // decides when to show the information under the leaderboard
+        userRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+                assert layoutManager != null;
+                int firstItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+                int lastItemPosition = layoutManager.findLastVisibleItemPosition();
+
+                // the first shown user on the recyclerView
+                UserAdapter.ViewHolder firstShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(firstItemPosition);
+                UserAdapter.ViewHolder lastShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(lastItemPosition);
+
+                assert firstShownUser != null;
+                int firstRank = Integer.parseInt(((String) firstShownUser.rank.getText()).substring(1));
+                assert lastShownUser != null;
+                int lastRank = Integer.parseInt(((String) lastShownUser.rank.getText()).substring(1));
+                int userRank = Integer.parseInt(((String) your_rank.getText()).substring(1));
+
+                if (lastRank >= userRank && userRank >= firstRank) {
+                    your_info.setVisibility(View.GONE);
+                } else {
+                    your_info.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void setUpForumRecycler() {
@@ -143,6 +189,7 @@ public class ProfileFragment extends Fragment {
     private void setUpUserRecycler() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
         reference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
@@ -152,6 +199,12 @@ public class ProfileFragment extends Fragment {
                 }
 
                 users.sort((o1, o2) -> Integer.compare(o2.getUserPoints(), o1.getUserPoints()));
+                int rank = 0;
+                for (User user : users) {
+                    rank++;
+                    if (user.getUsername().equals(firebaseUser.getDisplayName()))
+                        your_rank.setText("#" + rank);
+                }
 
                 userAdapter = new UserAdapter(users, getContext());
                 userRecycler.setAdapter(userAdapter);
@@ -183,6 +236,7 @@ public class ProfileFragment extends Fragment {
                     bio_tv.setText(bio);
                     QA_tv.setText(QA);
                     points_tv.setText(points);
+                    your_score.setText(points);
 
                     // Set user DP (after user has uploaded)
                     Uri uri = firebaseUser.getPhotoUrl();

@@ -65,7 +65,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             username = itemView.findViewById(R.id.username);
             score = itemView.findViewById(R.id.score);
             rank = itemView.findViewById(R.id.rank);

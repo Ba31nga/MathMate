@@ -218,9 +218,16 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/userRecycler"
                 android:layout_width="300dp"
-                android:layout_height="150dp"
+                android:layout_height="217dp"
                 android:layout_gravity="center"
                 android:scrollbars="vertical" />
+            <include layout="@layout/user_row"
+                android:visibility="gone"
+                android:id="@+id/your_info"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
 
         </LinearLayout>
 
