@@ -64,7 +64,7 @@
             android:background="@drawable/corner_radius"
             android:ems="22"
             android:gravity="top|start"
-            android:inputType="text"
+            android:inputType="textCapSentences|textMultiLine"
             android:textColor="@color/white"
             tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 

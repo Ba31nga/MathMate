@@ -1,7 +1,6 @@
 package com.example.mathmate;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,10 +35,8 @@ public class AddForumActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 2;
 
 
-    private ImageButton backBTN;
     private ImageView forumImage, uploadImage;
     private Uri uriImage;
-    private ActivityResultLauncher<Uri> takePictureLauncher;
     private EditText titleET, subjectET;
 
     @Override
@@ -62,7 +58,7 @@ public class AddForumActivity extends AppCompatActivity {
         uploadImage = findViewById(R.id.upload_img);
         forumImage.setVisibility(View.GONE);
 
-        backBTN = findViewById(R.id.go_back_btn);
+        ImageButton backBTN = findViewById(R.id.go_back_btn);
         backBTN.setOnClickListener(v -> finish());
 
 
@@ -72,9 +68,7 @@ public class AddForumActivity extends AppCompatActivity {
         // Adding photo to the forum
         browseGalleryBTN.setOnClickListener(v -> openFileChooser());
 
-        takePhotoBTN.setOnClickListener(v -> {
-            checkCameraPermissionAndOpenCamera();
-        });
+        takePhotoBTN.setOnClickListener(v -> checkCameraPermissionAndOpenCamera());
 
 
         // Passing the necessary information to the next activity
@@ -155,7 +149,7 @@ public class AddForumActivity extends AppCompatActivity {
             assert imageBitmap != null;
 
             // converts bitmap to uri
-            uriImage = getImageUri(AddForumActivity.this, imageBitmap);
+            uriImage = getImageUri(imageBitmap);
 
             Glide.with(AddForumActivity.this).load(uriImage).into(forumImage);
             forumImage.setVisibility(View.VISIBLE);
@@ -163,10 +157,10 @@ public class AddForumActivity extends AppCompatActivity {
         }
     }
 
-    public Uri getImageUri(Context inContext, Bitmap inImage) {
+    public Uri getImageUri(Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        String path = MediaStore.Images.Media.insertImage(AddForumActivity.this.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
     }
 

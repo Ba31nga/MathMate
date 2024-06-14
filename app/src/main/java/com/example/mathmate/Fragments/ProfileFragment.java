@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Adapters.ForumAdapter;
+import com.example.mathmate.Adapters.UserAdapter;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.Profile.ChangeProfilePictureActivity;
@@ -35,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -45,15 +48,18 @@ public class ProfileFragment extends Fragment {
     private TextView username_tv, bio_tv, QA_tv, points_tv;
     private ImageView pfp;
     private ProgressBar progressBar;
-    private RecyclerView forumRecycler;
+    private RecyclerView forumRecycler, userRecycler;
 
     // vars
 
     private String username, bio, QA, points;
     private FirebaseAuth authProfile;
-    FirebaseUser firebaseUser;
-    private ForumAdapter adapter;
+    private FirebaseUser firebaseUser;
+    private ForumAdapter forumAdapter;
+    private UserAdapter userAdapter;
     private List<Forum> forums;
+    private List<User> users;
+
 
 
     @Override
@@ -69,7 +75,14 @@ public class ProfileFragment extends Fragment {
 
         forumRecycler = v.findViewById(R.id.forumRecycler);
         forumRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        forumRecycler.addItemDecoration(new DividerItemDecoration(forumRecycler.getContext(), DividerItemDecoration.VERTICAL));
         forums = new ArrayList<>();
+
+        userRecycler = v.findViewById(R.id.userRecycler);
+        userRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        userRecycler.addItemDecoration(new DividerItemDecoration(userRecycler.getContext(), DividerItemDecoration.VERTICAL));
+        users = new ArrayList<>();
+
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -99,27 +112,54 @@ public class ProfileFragment extends Fragment {
             Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         } else {
             showUserProfile(firebaseUser);
-            setUpRecycler();
+            setUpForumRecycler();
+            setUpUserRecycler();
         }
 
 
         return v;
     }
 
-    private void setUpRecycler() {
+    private void setUpForumRecycler() {
         Query query = FirebaseDatabase.getInstance().getReference("Forums").orderByChild("authorUid").equalTo(firebaseUser.getUid());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                forums.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    forums.add(dataSnapshot.getValue(Forum.class));
+                    Forum forum = dataSnapshot.getValue(Forum.class);
+                    forums.add(forum);
                 }
-                adapter = new ForumAdapter(forums, getContext());
-                forumRecycler.setAdapter(adapter);
+                forumAdapter = new ForumAdapter(forums, getContext());
+                forumRecycler.setAdapter(forumAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void setUpUserRecycler() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                users.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    users.add(user);
+                }
+
+                users.sort((o1, o2) -> Integer.compare(o2.getUserPoints(), o1.getUserPoints()));
+
+                userAdapter = new UserAdapter(users, getContext());
+                userRecycler.setAdapter(userAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -149,6 +189,7 @@ public class ProfileFragment extends Fragment {
 
                     // Imageview setImageURI() should not be used with regular URIs - so we are using Picasso
                     Glide.with(getContext()).load(uri).placeholder(R.drawable.default_pfp).into(pfp);
+
                     progressBar.setVisibility(View.GONE);
                 } else {
                     Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();

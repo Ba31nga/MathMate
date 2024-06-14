@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,7 +36,6 @@ public class ForumsFragment extends Fragment {
     // vars
     private List<Forum> forums;
     private DatabaseReference database;
-    private ForumAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,6 +49,7 @@ public class ForumsFragment extends Fragment {
 
         recyclerView = v.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
         forums = new ArrayList<>();
 
@@ -87,7 +88,7 @@ public class ForumsFragment extends Fragment {
                     if (forum.getTitle().toLowerCase().startsWith(s) || forum.getSubject().toLowerCase().startsWith(s))
                         forums.add(forum);
                 }
-                updateForumList();
+                updateAdapter();
             }
 
             @Override
@@ -107,7 +108,7 @@ public class ForumsFragment extends Fragment {
                         Forum forum = dataSnapshot.getValue(Forum.class);
                         forums.add(forum);
                     }
-                    updateForumList();
+                    updateAdapter();
                 }
             }
 
@@ -121,8 +122,8 @@ public class ForumsFragment extends Fragment {
 
 
 
-    private void updateForumList() {
-        adapter = new ForumAdapter(forums, getContext());
+    private void updateAdapter() {
+        ForumAdapter adapter = new ForumAdapter(forums, getContext());
         recyclerView.setAdapter(adapter);
     }
 

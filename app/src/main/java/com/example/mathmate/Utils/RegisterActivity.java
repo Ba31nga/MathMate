@@ -111,14 +111,11 @@ public class RegisterActivity extends AppCompatActivity {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dsp : snapshot.getChildren()) {
-                    User item = dsp.getValue(User.class);
-                    if (item != null && item.getUsername().equals(username)) {
-                        username_input.requestFocus();
-                        username_input.setError("Username is already taken");
-                        progressBar.setVisibility(View.GONE);
-                        return;
-                    }
+                if (snapshot.exists()) {
+                    username_input.requestFocus();
+                    username_input.setError("Username is already taken");
+                    progressBar.setVisibility(View.GONE);
+                    return;
                 }
 
                 // adds user to the firebase authenticator

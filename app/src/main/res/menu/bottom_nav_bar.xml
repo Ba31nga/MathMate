@@ -17,6 +17,6 @@
         android:title="@string/forums" />
     <item
         android:id="@+id/notifications"
-        android:icon="@drawable/notification_active"
+        android:icon="@drawable/notifications"
         android:title="@string/notifications" />
 </menu>

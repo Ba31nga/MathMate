@@ -41,4 +41,7 @@
     <string name="likes">likes</string>
     <string name="comment_content">Comment content</string>
     <string name="like_count">Like count</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="rank">r</string>
+    <string name="score">score</string>
 </resources>

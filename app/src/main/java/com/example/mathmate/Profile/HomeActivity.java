@@ -32,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
 
     // m4thmat3@gmail.com
 
-    BottomNavigationView bottom_nav_bar;
+    private BottomNavigationView bottom_nav_bar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +93,17 @@ public class HomeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
             }
         });
+    }
+
+    private Fragment getFragment(int n) {
+        switch (n) {
+            case 1:
+                return new ForumsFragment();
+            case 2:
+                return new NotificationsFragment();
+            default:
+                return new ProfileFragment();
+        }
     }
 
     private void replaceFragment(Fragment fragment) {
