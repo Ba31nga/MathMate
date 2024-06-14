@@ -9,7 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,12 +44,18 @@ import java.util.List;
 public class ProfileFragment extends Fragment {
 
     // widgets
-
-    private TextView username_tv, bio_tv, QA_tv, points_tv, your_username, your_score, your_rank;
-    private ImageView pfp, your_pfp;
+    private LinearLayout questions_asked;
+    private TextView username_tv;
+    private TextView bio_tv;
+    private TextView QA_tv;
+    private TextView points_tv;
+    private TextView your_score;
+    private TextView your_rank;
+    private ImageView pfp;
     private ProgressBar progressBar;
     private RecyclerView forumRecycler, userRecycler;
     private View your_info;
+    private ScrollView scrollView;
 
     // vars
 
@@ -67,6 +75,8 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        scrollView = v.findViewById(R.id.main);
+
         // the info on the top of the screen
         username_tv = v.findViewById(R.id.username_tv);
         bio_tv = v.findViewById(R.id.bio_tv);
@@ -79,8 +89,8 @@ public class ProfileFragment extends Fragment {
         firebaseUser = authProfile.getCurrentUser();
 
         // your info under the leaderboard
-        your_username = v.findViewById(R.id.username);
-        your_pfp = v.findViewById(R.id.profile_picture);
+        TextView your_username = v.findViewById(R.id.username);
+        ImageView your_pfp = v.findViewById(R.id.profile_picture);
         your_rank = v.findViewById(R.id.rank);
         your_score = v.findViewById(R.id.score);
         your_info = v.findViewById(R.id.your_info);
@@ -104,33 +114,37 @@ public class ProfileFragment extends Fragment {
         ImageButton logout_btn = v.findViewById(R.id.logout_btn);
         ImageButton settings_btn = v.findViewById(R.id.settings_btn);
 
-        // transfers the user to an activity where he can change his profile picture
-        pfp.setOnClickListener(v12 -> {
-            Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
-            startActivity(intent);
-
-        });
-
-        // logging out the user from his account
-        logout_btn.setOnClickListener(v1 -> {
-            authProfile.signOut();
-
-            Intent intent = new Intent(getContext(), LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-        });
+        // question asked linear layout which holds the text and the recycler view
+        questions_asked = v.findViewById(R.id.questions_asked);
+        questions_asked.setVisibility(View.GONE);
 
         if (firebaseUser == null) {
             Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         } else {
+            // transfers the user to an activity where he can change his profile picture
+            pfp.setOnClickListener(v12 -> {
+                Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
+                startActivity(intent);
+            });
+
+            // logging out the user from his account
+            logout_btn.setOnClickListener(v1 -> {
+                authProfile.signOut();
+                Intent intent = new Intent(getContext(), LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            });
+
             // shows the data on the screen
             showUserProfile(firebaseUser);
             // handles the recycler views
             setUpForumRecycler();
             setUpUserRecycler();
+
+            // showing the info under the leaderboard only when it doesn't shows on one of the visible
+            // items of the leaderboard recyclerview
             infoShowingHandler();
         }
-
 
         return v;
     }
@@ -147,7 +161,7 @@ public class ProfileFragment extends Fragment {
                 int firstItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastItemPosition = layoutManager.findLastVisibleItemPosition();
 
-                // the first shown user on the recyclerView
+                // the first and last shown user on the recyclerView
                 UserAdapter.ViewHolder firstShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(firstItemPosition);
                 UserAdapter.ViewHolder lastShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(lastItemPosition);
 
@@ -158,9 +172,13 @@ public class ProfileFragment extends Fragment {
                 int userRank = Integer.parseInt(((String) your_rank.getText()).substring(1));
 
                 if (lastRank >= userRank && userRank >= firstRank) {
+                    // the user is shown on the leaderboard recycler view
                     your_info.setVisibility(View.GONE);
                 } else {
+                    // the user isn't showing on the leaderboard recyclerview
                     your_info.setVisibility(View.VISIBLE);
+                    // scrolls the user down to the bottom
+                    scrollView.post(() -> scrollView.scrollTo(0, scrollView.getBottom()));
                 }
             }
         });
@@ -175,6 +193,11 @@ public class ProfileFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Forum forum = dataSnapshot.getValue(Forum.class);
                     forums.add(forum);
+                }
+                if (!forums.isEmpty())
+                {
+                    // the user asked at least 1 question
+                    questions_asked.setVisibility(View.VISIBLE);
                 }
                 forumAdapter = new ForumAdapter(forums, getContext());
                 forumRecycler.setAdapter(forumAdapter);
