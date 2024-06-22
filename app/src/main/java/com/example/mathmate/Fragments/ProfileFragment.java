@@ -21,11 +21,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.GlideException;
 import com.example.mathmate.Adapters.ForumAdapter;
 import com.example.mathmate.Adapters.UserAdapter;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.Profile.ChangeProfilePictureActivity;
+import com.example.mathmate.Profile.UpdateProfileActivity;
 import com.example.mathmate.R;
 import com.example.mathmate.Utils.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,7 +41,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ProfileFragment extends Fragment {
 
@@ -58,7 +59,6 @@ public class ProfileFragment extends Fragment {
     private ScrollView scrollView;
 
     // vars
-
     private String username, bio, QA, points;
     private FirebaseAuth authProfile;
     private FirebaseUser firebaseUser;
@@ -67,12 +67,9 @@ public class ProfileFragment extends Fragment {
     private List<Forum> forums;
     private List<User> users;
 
-
-
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
 
         scrollView = v.findViewById(R.id.main);
@@ -87,6 +84,11 @@ public class ProfileFragment extends Fragment {
         // authentication
         authProfile = FirebaseAuth.getInstance();
         firebaseUser = authProfile.getCurrentUser();
+
+        if (firebaseUser == null) {
+            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            return v;
+        }
 
         // your info under the leaderboard
         TextView your_username = v.findViewById(R.id.username);
@@ -118,33 +120,35 @@ public class ProfileFragment extends Fragment {
         questions_asked = v.findViewById(R.id.questions_asked);
         questions_asked.setVisibility(View.GONE);
 
-        if (firebaseUser == null) {
-            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
-        } else {
-            // transfers the user to an activity where he can change his profile picture
-            pfp.setOnClickListener(v12 -> {
-                Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
-                startActivity(intent);
-            });
+        // transfers the user to an activity where he can change his profile picture
+        pfp.setOnClickListener(v12 -> {
+            Intent intent = new Intent(getContext(), ChangeProfilePictureActivity.class);
+            startActivity(intent);
+        });
 
-            // logging out the user from his account
-            logout_btn.setOnClickListener(v1 -> {
-                authProfile.signOut();
-                Intent intent = new Intent(getContext(), LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            });
+        settings_btn.setOnClickListener(v13 -> {
+            // transfers user to the settings
+            Intent intent = new Intent(getContext(), UpdateProfileActivity.class);
+            startActivity(intent);
+        });
 
-            // shows the data on the screen
-            showUserProfile(firebaseUser);
-            // handles the recycler views
-            setUpForumRecycler();
-            setUpUserRecycler();
+        // logging out the user from his account
+        logout_btn.setOnClickListener(v1 -> {
+            authProfile.signOut();
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        });
 
-            // showing the info under the leaderboard only when it doesn't shows on one of the visible
-            // items of the leaderboard recyclerview
-            infoShowingHandler();
-        }
+        // shows the data on the screen
+        showUserProfile(firebaseUser);
+        // handles the recycler views
+        setUpForumRecycler();
+        setUpUserRecycler();
+
+        // showing the info under the leaderboard only when it doesn't shows on one of the visible
+        // items of the leaderboard recyclerview
+        infoShowingHandler();
 
         return v;
     }
@@ -157,7 +161,9 @@ public class ProfileFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
 
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+                // Layout manager of the adapter
                 assert layoutManager != null;
+                // the positions of the first and the last visible items on the recycler view
                 int firstItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastItemPosition = layoutManager.findLastVisibleItemPosition();
 
@@ -166,9 +172,12 @@ public class ProfileFragment extends Fragment {
                 UserAdapter.ViewHolder lastShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(lastItemPosition);
 
                 assert firstShownUser != null;
+                // the first rank that is shown on the recyclerview
                 int firstRank = Integer.parseInt(((String) firstShownUser.rank.getText()).substring(1));
                 assert lastShownUser != null;
+                // the last rank that is shown on the recyclerview
                 int lastRank = Integer.parseInt(((String) lastShownUser.rank.getText()).substring(1));
+                // the rank of the current user
                 int userRank = Integer.parseInt(((String) your_rank.getText()).substring(1));
 
                 if (lastRank >= userRank && userRank >= firstRank) {
@@ -185,31 +194,36 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setUpForumRecycler() {
+        // all the forums that the current user created
         Query query = FirebaseDatabase.getInstance().getReference("Forums").orderByChild("authorUid").equalTo(firebaseUser.getUid());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 forums.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // adds all of the forums that the current user created to the list
                     Forum forum = dataSnapshot.getValue(Forum.class);
                     forums.add(forum);
                 }
-                if (!forums.isEmpty())
-                {
+                if (!forums.isEmpty()) {
                     // the user asked at least 1 question
                     questions_asked.setVisibility(View.VISIBLE);
                 }
+                // adds new adapter to the recycler view (with the list that was created)
                 forumAdapter = new ForumAdapter(forums, getContext());
                 forumRecycler.setAdapter(forumAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "Failed to load forums: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setUpUserRecycler() {
+        // manages the leaderboard
+        // a reference to all of the registered users
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -217,25 +231,29 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // adds all of the registered users to the list
                     User user = dataSnapshot.getValue(User.class);
                     users.add(user);
                 }
 
+                // sorts them by the points they have
                 users.sort((o1, o2) -> Integer.compare(o2.getUserPoints(), o1.getUserPoints()));
                 int rank = 0;
                 for (User user : users) {
                     rank++;
-                    if (user.getUsername().equals(firebaseUser.getDisplayName()))
+                    if (user.getUsername().equals(firebaseUser.getDisplayName())) {
                         your_rank.setText("#" + rank);
+                    }
                 }
 
+                // adds the new adapter to the recycler view with the new list that was created
                 userAdapter = new UserAdapter(users, getContext());
                 userRecycler.setAdapter(userAdapter);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(getContext(), "Failed to load users: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -264,8 +282,12 @@ public class ProfileFragment extends Fragment {
                     // Set user DP (after user has uploaded)
                     Uri uri = firebaseUser.getPhotoUrl();
 
-                    // Imageview setImageURI() should not be used with regular URIs - so we are using Picasso
-                    Glide.with(getContext()).load(uri).placeholder(R.drawable.default_pfp).into(pfp);
+                    // Imageview setImageURI() should not be used with regular URIs - so we are using Glide
+                    Glide.with(getContext())
+                            .load(uri)
+                            .placeholder(R.drawable.default_pfp)
+                            .error(R.drawable.default_pfp)
+                            .into(pfp);
 
                     progressBar.setVisibility(View.GONE);
                 } else {
@@ -275,7 +297,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load user profile: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

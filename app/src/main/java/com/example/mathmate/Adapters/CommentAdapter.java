@@ -34,6 +34,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     private final Context context;
 
     public CommentAdapter(List<Comment> comments, Context context) {
+        // constructor
         this.comments = comments;
         this.context = context;
     }
@@ -47,6 +48,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // displaying the comment in the position
         final Comment comment = comments.get(position);
 
         holder.delete_btn.setVisibility(View.GONE);
@@ -111,6 +113,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     private void removeNotifications(Comment comment) {
+        // remove the notification related to the comment
         DatabaseReference forumRef = FirebaseDatabase.getInstance().getReference("Forums");
         Query query = forumRef.child(comment.getForumId());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -204,6 +207,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 User writer_of_comment = snapshot.getValue(User.class);
                 assert writer_of_comment != null;
                 writer_of_comment.addPoint(x);
+                snapshot.getRef().setValue(writer_of_comment);
             }
 
             @Override
@@ -223,6 +227,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 assert writer_of_comment != null;
                 writer_of_comment.removePoint(comment.getLikes());
                 writer_of_comment.removeAnswers();
+                snapshot.getRef().setValue(writer_of_comment);
             }
 
             @Override

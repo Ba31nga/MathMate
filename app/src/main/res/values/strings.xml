@@ -21,7 +21,7 @@
     <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="username">Username</string>
-    <string name="bio">bio</string>
+    <string name="bio">Bio</string>
     <string name="forums">Forums</string>
     <string name="profile">Profile</string>
     <string name="add_forum">Add Forum</string>
@@ -44,4 +44,5 @@
     <string name="leaderboard">Leaderboard</string>
     <string name="rank">r</string>
     <string name="score">score</string>
+    <string name="update_profile">Update profile</string>
 </resources>

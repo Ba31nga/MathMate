@@ -128,7 +128,7 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             uriImage = data.getData();
-            new_pfp.setImageURI(uriImage);
+            Glide.with(ChangeProfilePictureActivity.this).load(uriImage).placeholder(R.drawable.default_pfp).into(new_pfp);
         }
     }
 }
