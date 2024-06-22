@@ -2,18 +2,15 @@ package com.example.mathmate.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mathmate.CommentsActivity;
-import com.example.mathmate.Fragments.DisplayForumFragment;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.Notification;
 import com.example.mathmate.R;
@@ -29,8 +26,8 @@ import java.util.List;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder> {
 
-    private List<Notification> notifications;
-    private Context context;
+    private final List<Notification> notifications;
+    private final Context context;
 
     public NotificationsAdapter(List<Notification> notifications, Context context) {
         this.notifications = notifications;
@@ -41,7 +38,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(context).inflate(R.layout.notification, parent, false);
-        return new NotificationsAdapter.ViewHolder(v);
+        return new ViewHolder(v);
+
     }
 
     @Override
@@ -65,15 +63,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         });
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, CommentsActivity.class);
-                intent.putExtra("forumid", notification.getForumId());
-                context.startActivity(intent);
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, CommentsActivity.class);
+            intent.putExtra("forumid", notification.getForumId());
+            context.startActivity(intent);
 
-                removeNotificationFromDatabase(notification);
-            }
+            removeNotificationFromDatabase(notification);
         });
     }
 
@@ -100,7 +95,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return notifications.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView title, message;
 
         public ViewHolder(@NonNull View itemView) {

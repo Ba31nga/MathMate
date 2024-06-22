@@ -64,45 +64,22 @@ public class User {
 
     public void addAnswers() {
         questionAnswered++;
-        updateDatabase();
     }
 
     public void removeAnswers() {
         questionAnswered--;
-        updateDatabase();
     }
 
     public void addPoint(int x) {
         userPoints += x;
-        updateDatabase();
     }
 
     public void removePoint() {
         userPoints--;
-        updateDatabase();
     }
 
     public void removePoint(int points) {
         userPoints -= points;
-        updateDatabase();
-    }
-
-    private void updateDatabase() {
-        DatabaseReference commentsRef = FirebaseDatabase.getInstance().getReference("Registered Users");
-        Query query = commentsRef.orderByChild("username").equalTo(username);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    DatabaseReference userRef = dataSnapshot.getRef();
-                    userRef.setValue(User.this);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
     }
 
 }

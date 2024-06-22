@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkBG"
+    tools:context=".Profile.UpdateProfileActivity">
+
+    <ImageButton
+        android:id="@+id/go_back_btn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/darkBG"
+        android:contentDescription="@string/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/go_back" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:id="@+id/container1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:orientation="vertical"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/update_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:text="@string/update_profile"
+                android:textColor="@color/white"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+            <EditText
+                android:id="@+id/username_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:autofillHints=""
+                android:background="@drawable/corner_radius"
+                android:ems="10"
+                android:hint="New username"
+                android:inputType="text"
+                android:paddingStart="15dp"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
+                android:textColor="@color/white"
+                android:textColorHint="#C8C8C8"
+                tools:ignore="HardcodedText,RtlSymmetry" />
+
+            <EditText
+                android:id="@+id/bio_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:autofillHints=""
+                android:background="@drawable/corner_radius"
+                android:ems="10"
+                android:hint="@string/bio"
+                android:inputType="text"
+                android:paddingStart="15dp"
+                android:paddingTop="13dp"
+                android:paddingBottom="13dp"
+                android:textColor="@color/white"
+                android:textColorHint="#C8C8C8"
+                tools:ignore="HardcodedText,RtlSymmetry" />
+
+            <Button
+                android:id="@+id/save_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:backgroundTint="@color/purple"
+                android:text="@string/save"
+                tools:ignore="HardcodedText,DuplicateSpeakableTextCheck" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

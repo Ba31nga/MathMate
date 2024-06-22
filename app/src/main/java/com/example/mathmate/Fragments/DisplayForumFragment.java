@@ -28,11 +28,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-
 public class DisplayForumFragment extends Fragment {
 
+    // Variable to store the ID of the forum to be displayed
     private String forumId;
 
+    // UI elements for displaying forum information
     private TextView username, title, subject, description;
     private ImageView profile_picture, forum_picture;
     private Button go_to_comments_btn;
@@ -40,8 +41,10 @@ public class DisplayForumFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_display_forum, container, false);
 
+        // Initialize UI elements
         username = v.findViewById(R.id.username);
         title = v.findViewById(R.id.title);
         subject = v.findViewById(R.id.subject);
@@ -50,7 +53,7 @@ public class DisplayForumFragment extends Fragment {
         forum_picture = v.findViewById(R.id.forum_image);
         go_to_comments_btn = v.findViewById(R.id.go_to_comments_btn);
 
-        // for rendering purposes we will show these views only after we finish to give them information
+        // Initially hide UI elements until data is loaded
         username.setVisibility(View.GONE);
         title.setVisibility(View.GONE);
         subject.setVisibility(View.GONE);
@@ -59,15 +62,18 @@ public class DisplayForumFragment extends Fragment {
         forum_picture.setVisibility(View.GONE);
         go_to_comments_btn.setVisibility(View.GONE);
 
+        // Retrieve the forum ID from SharedPreferences
         SharedPreferences prefs = getContext().getSharedPreferences("PREPS", Context.MODE_PRIVATE);
         forumId = prefs.getString("forumid", "none");
 
+        // Set a click listener for the comments button to open the CommentsActivity
         go_to_comments_btn.setOnClickListener(v1 -> {
             Intent intent = new Intent(getContext(), CommentsActivity.class);
             intent.putExtra("forumid", forumId);
             startActivity(intent);
         });
 
+        // Load and display forum information
         showForumInformation();
 
         return v;
@@ -75,23 +81,29 @@ public class DisplayForumFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void showForumInformation() {
-
-        // Extracting the forum reference from the database
+        // Get reference to the specific forum in the Firebase Database
         DatabaseReference forumReference = FirebaseDatabase.getInstance().getReference("Forums");
         Query forumQuery = forumReference.child(forumId);
+
+        // Attach a listener to read the forum data
         forumQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Get the Forum object from the database snapshot
                 Forum forum = snapshot.getValue(Forum.class);
-                // Extracting the user (the author of the forum) reference from the database
+
+                // Get reference to the author of the forum from the database
                 DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Registered Users");
                 Query userQuery = userReference.child(forum.getAuthorUid());
+
+                // Attach a listener to read the author data
                 userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Get the User object from the database snapshot
                         User author = snapshot.getValue(User.class);
 
-                        // putting author's profile picture in the forum pfp
+                        // Load the author's profile picture and forum picture using Glide
                         assert author != null;
                         Uri pfp = Uri.parse(author.getUri());
                         Uri forumImage = Uri.parse(forum.getImageUri());
@@ -99,18 +111,19 @@ public class DisplayForumFragment extends Fragment {
                         Glide.with(getContext()).load(pfp).placeholder(R.drawable.default_pfp).into(profile_picture);
                         Glide.with(getContext()).load(forumImage).placeholder(R.drawable.blankscreen).into(forum_picture);
 
-                        // putting all the information on the text views
+                        // Set the forum information to the TextViews
                         title.setText(forum.getTitle());
                         subject.setText("Subject : " + forum.getSubject());
                         description.setText(forum.getDescription());
                         username.setText(author.getUsername());
 
-                        // showing all the items
+                        // Make the UI elements visible after setting the data
                         username.setVisibility(View.VISIBLE);
                         title.setVisibility(View.VISIBLE);
                         subject.setVisibility(View.VISIBLE);
                         description.setVisibility(View.VISIBLE);
                         profile_picture.setVisibility(View.VISIBLE);
+                        // If there is no picture, then it won't show the forum picture
                         if (!forum.getImageUri().isEmpty())
                             forum_picture.setVisibility(View.VISIBLE);
                         go_to_comments_btn.setVisibility(View.VISIBLE);
@@ -118,15 +131,15 @@ public class DisplayForumFragment extends Fragment {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        // Handle possible errors
                     }
                 });
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // Handle possible errors
             }
         });
-
-
     }
 }

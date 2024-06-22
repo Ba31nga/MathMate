@@ -157,7 +157,9 @@ public class ProfileFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
 
                 LinearLayoutManager layoutManager = ((LinearLayoutManager) recyclerView.getLayoutManager());
+                // Layout manager of the adapter
                 assert layoutManager != null;
+                // the positions of the first and the last visible items on the recycler view
                 int firstItemPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
                 int lastItemPosition = layoutManager.findLastVisibleItemPosition();
 
@@ -166,9 +168,12 @@ public class ProfileFragment extends Fragment {
                 UserAdapter.ViewHolder lastShownUser = (UserAdapter.ViewHolder) userRecycler.findViewHolderForAdapterPosition(lastItemPosition);
 
                 assert firstShownUser != null;
+                // the first rank that is shown on the recyclerview
                 int firstRank = Integer.parseInt(((String) firstShownUser.rank.getText()).substring(1));
                 assert lastShownUser != null;
+                // the last rank that is shown on the recyclerview
                 int lastRank = Integer.parseInt(((String) lastShownUser.rank.getText()).substring(1));
+                // the rank of the current user
                 int userRank = Integer.parseInt(((String) your_rank.getText()).substring(1));
 
                 if (lastRank >= userRank && userRank >= firstRank) {
@@ -185,12 +190,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setUpForumRecycler() {
+        // all the forums that the current user created
         Query query = FirebaseDatabase.getInstance().getReference("Forums").orderByChild("authorUid").equalTo(firebaseUser.getUid());
         query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 forums.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // adds all of the forums that the current user created to the list
                     Forum forum = dataSnapshot.getValue(Forum.class);
                     forums.add(forum);
                 }
@@ -199,6 +206,7 @@ public class ProfileFragment extends Fragment {
                     // the user asked at least 1 question
                     questions_asked.setVisibility(View.VISIBLE);
                 }
+                // adds new adapter to the recycler view (with the list that was created)
                 forumAdapter = new ForumAdapter(forums, getContext());
                 forumRecycler.setAdapter(forumAdapter);
             }
@@ -210,6 +218,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void setUpUserRecycler() {
+        // manages the leaderboard
+        // a reference to all of the registered users
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Registered Users");
         reference.addValueEventListener(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -217,10 +227,12 @@ public class ProfileFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 users.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    // adds all of the registered users to the list
                     User user = dataSnapshot.getValue(User.class);
                     users.add(user);
                 }
 
+                // sorts them by the points they have
                 users.sort((o1, o2) -> Integer.compare(o2.getUserPoints(), o1.getUserPoints()));
                 int rank = 0;
                 for (User user : users) {
@@ -229,6 +241,7 @@ public class ProfileFragment extends Fragment {
                         your_rank.setText("#" + rank);
                 }
 
+                // adds the new adapter to the recycler view with the new list that was created
                 userAdapter = new UserAdapter(users, getContext());
                 userRecycler.setAdapter(userAdapter);
             }
@@ -264,7 +277,7 @@ public class ProfileFragment extends Fragment {
                     // Set user DP (after user has uploaded)
                     Uri uri = firebaseUser.getPhotoUrl();
 
-                    // Imageview setImageURI() should not be used with regular URIs - so we are using Picasso
+                    // Imageview setImageURI() should not be used with regular URIs - so we are using Glide
                     Glide.with(getContext()).load(uri).placeholder(R.drawable.default_pfp).into(pfp);
 
                     progressBar.setVisibility(View.GONE);

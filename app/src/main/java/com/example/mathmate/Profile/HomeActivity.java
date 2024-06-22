@@ -45,22 +45,31 @@ public class HomeActivity extends AppCompatActivity {
             return insets;
         });
 
-
+        // puts in the frame layout profile fragment at the beginning
         replaceFragment(new ProfileFragment());
         bottom_nav_bar = findViewById(R.id.bottomNavigationView);
 
+        // checks if there is notifications (and changes the logo accordingly)
         checkForNotifications();
+
 
         bottom_nav_bar.setOnItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.profile) {
+                // profile button pressed
+                // puts in the layout a profile fragment
                 replaceFragment(new ProfileFragment());
             } else if (menuItem.getItemId() == R.id.add_forum) {
+                // add forum button pressed
+                // starts a addForumActivity
                 Intent intent = new Intent(HomeActivity.this, AddForumActivity.class);
                 startActivity(intent);
             } else if (menuItem.getItemId() == R.id.forums) {
+                // forums button pressed
+                // puts in the layout a forums fragment
                 replaceFragment(new ForumsFragment());
             }
             else if (menuItem.getItemId() == R.id.notifications) {
+                // puts in the layout a notification fragment
                 replaceFragment(new NotificationsFragment());
             }
             return true;

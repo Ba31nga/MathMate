@@ -63,6 +63,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
                     User user = dataSnapshot.getValue(User.class);
                     assert user != null;
                     Uri uriImage = Uri.parse(user.getUri());
+                    // Imageview setImageURI() should not be used with regular URIs - so we are using Glide
                     Glide.with(context).load(uriImage).placeholder(R.drawable.default_pfp).into(holder.profilePicture);
                 }
             }
@@ -80,6 +81,7 @@ public class ForumAdapter extends RecyclerView.Adapter<ForumAdapter.ViewHolder> 
             editor.putString("forumid", forum.getId());
             editor.apply();
 
+            // changes the fragment on the layout to a new DisplayForumFragment
             ((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.frame_layout, new DisplayForumFragment()).commit();
         });
     }
