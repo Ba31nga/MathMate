@@ -1,5 +1,7 @@
 package com.example.mathmate.Fragments;
 
+import static com.example.mathmate.Utils.NotesUtil.errorMessage;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.net.Uri;
@@ -216,7 +218,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load forums: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                errorMessage(getContext(), error.getMessage());
             }
         });
     }
@@ -253,7 +255,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load users: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                errorMessage(getContext(), error.getMessage());
             }
         });
     }
@@ -297,7 +299,7 @@ public class ProfileFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "Failed to load user profile: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                errorMessage(getContext(), error.getMessage());
             }
         });
     }

@@ -45,4 +45,7 @@
     <string name="rank">r</string>
     <string name="score">score</string>
     <string name="update_profile">Update profile</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
 </resources>

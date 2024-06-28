@@ -1,5 +1,7 @@
 package com.example.mathmate.Adapters;
 
+import static com.example.mathmate.Utils.NotesUtil.errorMessage;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
@@ -71,6 +73,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             // if the current logged user is the one who wrote the comment, allow him to delete the comment
             holder.delete_btn.setVisibility(View.VISIBLE);
             holder.delete_btn.setOnClickListener(v -> deleteComment(comment));
+            holder.like_btn.setOnClickListener(v -> errorMessage(context, "You can't like yourself"));
         } else {
             // if the current logged user is not the one who wrote the comment, allow him to like the comment
 
@@ -123,6 +126,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 Forum forum = snapshot.getValue(Forum.class);
                 // removes the notifications related to the comment
                 DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
+                assert forum != null;
                 notificationsRef.child(forum.getAuthorUid()).child(comment.getId()).removeValue();
             }
 

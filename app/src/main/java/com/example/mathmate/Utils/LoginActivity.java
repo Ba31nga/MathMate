@@ -1,6 +1,11 @@
 package com.example.mathmate.Utils;
 
+import static com.example.mathmate.Utils.NotesUtil.errorMessage;
+import static com.example.mathmate.Utils.NotesUtil.successMessage;
+
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,8 +16,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
-import com.example.mathmate.Profile.HomeActivity;
+import com.example.mathmate.HomeActivity;
 import com.example.mathmate.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -21,11 +27,16 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
+import www.sanju.motiontoast.MotionToast;
+import www.sanju.motiontoast.MotionToastStyle;
+
 public class LoginActivity extends AppCompatActivity {
 
     private EditText email_input, password_input;
     private FirebaseAuth authProfile;
     private static final String TAG = "LoginActivity";
+    private NetworkChangeReceiver networkChangeReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                 // check if email is verified
                 assert firebaseUser != null;
                 if (firebaseUser.isEmailVerified()) {
-                    Toast.makeText(LoginActivity.this, "Login successfully", Toast.LENGTH_SHORT).show();
+                    successMessage(LoginActivity.this,"Login was successfully");
                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
                 } else {
@@ -99,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                     email_input.requestFocus();
                 } catch (Exception e) {
                     Log.e(TAG, Objects.requireNonNull(e.getMessage()));
-                    Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    errorMessage(LoginActivity.this ,e.getMessage());
                 }
             }
 
@@ -114,6 +125,17 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
             finish();
         }
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 
     private void showAlertDialog() {
@@ -137,4 +159,7 @@ public class LoginActivity extends AppCompatActivity {
         alertDialog.show();
 
     }
+
+
+
 }

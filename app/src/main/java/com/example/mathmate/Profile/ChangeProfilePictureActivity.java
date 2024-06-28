@@ -1,7 +1,11 @@
 package com.example.mathmate.Profile;
 
+import static com.example.mathmate.Utils.NotesUtil.successMessage;
+
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.bumptech.glide.Glide;
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
+import com.example.mathmate.Utils.NetworkChangeReceiver;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -40,6 +45,7 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
     private FirebaseUser firebaseUser;
     private Uri uriImage;
     private ProgressBar progressBar;
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +107,7 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
                 referenceProfile.child(firebaseUser.getUid()).setValue(update);
 
                 // Return to user profile
-                Toast.makeText(ChangeProfilePictureActivity.this, "New profile picture added successfully", Toast.LENGTH_SHORT).show();
+                successMessage(ChangeProfilePictureActivity.this, "New profile picture added successfully");
                 progressBar.setVisibility(View.GONE);
                 finish();
             }));
@@ -130,5 +136,21 @@ public class ChangeProfilePictureActivity extends AppCompatActivity {
             uriImage = data.getData();
             Glide.with(ChangeProfilePictureActivity.this).load(uriImage).placeholder(R.drawable.default_pfp).into(new_pfp);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 }

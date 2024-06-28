@@ -1,5 +1,7 @@
 package com.example.mathmate;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
@@ -23,6 +25,7 @@ import com.example.mathmate.Models.Comment;
 import com.example.mathmate.Models.Forum;
 import com.example.mathmate.Models.Notification;
 import com.example.mathmate.Models.User;
+import com.example.mathmate.Utils.NetworkChangeReceiver;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -56,6 +59,7 @@ public class CommentsActivity extends AppCompatActivity {
 
     // forum id that the comments section are related to
     private String forumId;
+    private NetworkChangeReceiver networkChangeReceiver;
 
 
     @Override
@@ -159,6 +163,7 @@ public class CommentsActivity extends AppCompatActivity {
                 User user = snapshot.getValue(User.class);
                 assert user != null;
                 user.addAnswers();
+                snapshot.getRef().setValue(user);
             }
 
             @Override
@@ -217,6 +222,22 @@ public class CommentsActivity extends AppCompatActivity {
         assert currentUser != null;
         username.setText(currentUser.getDisplayName());
         Glide.with(this).load(currentUser.getPhotoUrl()).placeholder(R.drawable.default_pfp).into(profile_picture);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 
 

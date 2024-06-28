@@ -1,8 +1,9 @@
-package com.example.mathmate.Profile;
+package com.example.mathmate;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -14,11 +15,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.mathmate.AddForumActivity;
 import com.example.mathmate.Fragments.ForumsFragment;
 import com.example.mathmate.Fragments.NotificationsFragment;
 import com.example.mathmate.Fragments.ProfileFragment;
-import com.example.mathmate.R;
+import com.example.mathmate.Utils.NetworkChangeReceiver;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +33,8 @@ public class HomeActivity extends AppCompatActivity {
     // m4thmat3@gmail.com
 
     private BottomNavigationView bottom_nav_bar;
+    private NetworkChangeReceiver networkChangeReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,16 +106,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private Fragment getFragment(int n) {
-        switch (n) {
-            case 1:
-                return new ForumsFragment();
-            case 2:
-                return new NotificationsFragment();
-            default:
-                return new ProfileFragment();
-        }
-    }
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -122,5 +114,19 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
+    }
 }

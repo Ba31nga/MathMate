@@ -1,10 +1,13 @@
 package com.example.mathmate;
 
+import static com.example.mathmate.Utils.NotesUtil.successMessage;
+
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -20,7 +23,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mathmate.Models.Forum;
-import com.example.mathmate.Profile.HomeActivity;
+import com.example.mathmate.Utils.NetworkChangeReceiver;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -36,8 +39,7 @@ public class ContinueAddForumActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private FirebaseUser firebaseUser;
     private ProgressBar progressBar;
-
-
+    private NetworkChangeReceiver networkChangeReceiver;
 
 
     @Override
@@ -91,6 +93,7 @@ public class ContinueAddForumActivity extends AppCompatActivity {
         Forum forum = new Forum(title, subject, descriptionET.getText().toString(), uriImage, firebaseUser.getUid());
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Forums");
         reference.child(forum.getId()).setValue(forum);
+        successMessage(ContinueAddForumActivity.this, "Forum added successfully");
 
         Intent intent = new Intent(ContinueAddForumActivity.this, HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -114,7 +117,7 @@ public class ContinueAddForumActivity extends AppCompatActivity {
             reference.child(forum.getId()).setValue(forum);
 
             // Return to user profile
-            Toast.makeText(ContinueAddForumActivity.this, "Forum added successfully", Toast.LENGTH_SHORT).show();
+            successMessage(ContinueAddForumActivity.this, "Forum added successfully");
             progressBar.setVisibility(View.GONE);
 
             Intent intent = new Intent(ContinueAddForumActivity.this, HomeActivity.class);
@@ -127,5 +130,21 @@ public class ContinueAddForumActivity extends AppCompatActivity {
         ContentResolver cR = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 }

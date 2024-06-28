@@ -1,5 +1,7 @@
 package com.example.mathmate.Utils;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
@@ -30,11 +33,15 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Objects;
 
+import www.sanju.motiontoast.MotionToast;
+import www.sanju.motiontoast.MotionToastStyle;
+
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText email_input, username_input, password_input, confirm_input;
     private ProgressBar progressBar;
     private static final String TAG = "RegisterActivity";
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +146,13 @@ public class RegisterActivity extends AppCompatActivity {
                                 progressBar.setVisibility(View.GONE);
 
                                 // user details was added to the realtime database
-                                Toast.makeText(RegisterActivity.this, "User registered successfully, please VERIFY your email", Toast.LENGTH_SHORT).show();
+                                MotionToast.Companion.darkToast(RegisterActivity.this,
+                                        "Success!",
+                                        "User registered successfully, please VERIFY your email",
+                                        MotionToastStyle.SUCCESS,
+                                        MotionToast.GRAVITY_BOTTOM,
+                                        MotionToast.LONG_DURATION,
+                                        ResourcesCompat.getFont(RegisterActivity.this, www.sanju.motiontoast.R.font.helvetica_regular));
 
                                 // sends verification email
                                 firebaseUser.sendEmailVerification();
@@ -149,7 +162,13 @@ public class RegisterActivity extends AppCompatActivity {
 
                             } else {
                                 progressBar.setVisibility(View.GONE);
-                                Toast.makeText(RegisterActivity.this, "Something went wrong, please try again", Toast.LENGTH_SHORT).show();
+                                MotionToast.Companion.darkToast(RegisterActivity.this,
+                                        "Failure!",
+                                        "Something went wrong, please try again",
+                                        MotionToastStyle.ERROR,
+                                        MotionToast.GRAVITY_BOTTOM,
+                                        MotionToast.LONG_DURATION,
+                                        ResourcesCompat.getFont(RegisterActivity.this, www.sanju.motiontoast.R.font.helvetica_regular));
                             }
                         });
 
@@ -175,10 +194,32 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(RegisterActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                MotionToast.Companion.darkToast(RegisterActivity.this,
+                        "Failure!",
+                        "Something went wrong, please try again",
+                        MotionToastStyle.ERROR,
+                        MotionToast.GRAVITY_BOTTOM,
+                        MotionToast.LONG_DURATION,
+                        ResourcesCompat.getFont(RegisterActivity.this, www.sanju.motiontoast.R.font.helvetica_regular));
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 
 }

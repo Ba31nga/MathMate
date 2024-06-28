@@ -1,12 +1,16 @@
 package com.example.mathmate.Profile;
 
-import android.content.Intent;
+import static com.example.mathmate.Utils.NotesUtil.errorMessage;
+import static com.example.mathmate.Utils.NotesUtil.successMessage;
+
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -17,6 +21,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.mathmate.Models.User;
 import com.example.mathmate.R;
+import com.example.mathmate.Utils.NetworkChangeReceiver;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -31,11 +36,10 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
     private EditText username_input; // EditText for username input
     private EditText bio_input; // EditText for bio input
-    private Button saveBtn; // Button to save changes
-    private Button backBtn; // Button to go back
     private DatabaseReference usersRef; // Reference to Firebase database
     FirebaseUser currentUser; // Current logged-in user
     ProgressBar progressBar; // progress bar
+    private NetworkChangeReceiver networkChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +67,14 @@ public class UpdateProfileActivity extends AppCompatActivity {
         // Show current user information in the input fields
         showInformation();
 
+        // Button to go back
+        ImageButton backBtn = findViewById(R.id.go_back_btn);
+        backBtn.setOnClickListener(v -> finish());
+
+
         // Initialize save button and set its click listener
-        saveBtn = findViewById(R.id.save_btn);
+        // Button to save changes
+        Button saveBtn = findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(v -> {
             // Get the new username and bio from the input fields
             String newUsername = username_input.getText().toString();
@@ -78,7 +88,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
+                    if (snapshot.exists() && !newUsername.equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
                         // If username already exists, show an error message
                         username_input.requestFocus();
                         username_input.setError("The username is already in use");
@@ -97,7 +107,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                     snapshot.getRef().setValue(user);
 
                                     // Show success message and finish the activity
-                                    Toast.makeText(UpdateProfileActivity.this, "Changes were successfully made", Toast.LENGTH_SHORT).show();
+                                    successMessage(UpdateProfileActivity.this, "Changes were successfully made");
                                     progressBar.setVisibility(View.GONE);
                                     finish();
                                 }
@@ -106,6 +116,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 // Handle error if the update is cancelled
+                                errorMessage(UpdateProfileActivity.this, "Something went wrong, please try again");
                             }
                         });
                     }
@@ -114,6 +125,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     // Handle error if the query is cancelled
+                    errorMessage(UpdateProfileActivity.this, "Something went wrong, please try again");
                 }
             });
         });
@@ -134,7 +146,24 @@ public class UpdateProfileActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 // Handle error if data retrieval is cancelled
+                errorMessage(UpdateProfileActivity.this, "Something went wrong, please try again");
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        networkChangeReceiver = new NetworkChangeReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister the receiver when the activity is destroyed
+        unregisterReceiver(networkChangeReceiver);
     }
 }
